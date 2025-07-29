@@ -1,0 +1,31 @@
+import { settings } from '@/assets/common-icons';
+import React from 'react';
+import Image from 'next/image';
+
+interface HeaderProps {
+    heading: string;
+    subheading: string;
+}
+
+function Header({ heading, subheading }: HeaderProps) {
+    return (
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 p-4">
+            <div className="flex flex-col gap-1">
+                <div className="lg:text-3xl text-2xl text-black">{heading}</div>
+                <div className="text-sm text-gray-700">{subheading}</div>
+            </div>
+            <div className="flex items-center gap-3">
+                <div className="rounded-xl">{settings}</div>
+                <Image
+                    src="/profile.svg"
+                    alt="Profile image"
+                    width={40}
+                    height={40}
+                    priority
+                />
+            </div>
+        </div>
+    );
+}
+
+export default Header;

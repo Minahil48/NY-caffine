@@ -13,7 +13,7 @@ const Sidebar = () => {
   const sidebarLinks = [
     {
       icon: Home,
-      link: "/Dashboard",
+      link: "/dashboard",
       label: "Home",
     },
     {
@@ -82,7 +82,7 @@ const Sidebar = () => {
               </Link>
             ))}
           </div>
-          <div className="ml-2 hover:text-white hover:bg-primary p-2 cursor-pointer rounded-md"><a href="/" className="flex gap-2">{Signout} Signout</a></div>
+          <div className="pl-2 hover:text-white hover:bg-primary p-2 cursor-pointer rounded-md"><a href="/" className="flex gap-2">{Signout} Signout</a></div>
         </div>
       </aside>
     </>
