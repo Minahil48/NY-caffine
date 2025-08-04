@@ -1,6 +1,5 @@
 import Header from '@/Components/Header'
 import OrderSection from '@/Components/OrderPage/OrderSection'
-import Table from '@/Components/OrderPage/OrderTable'
 import Sidebar from '@/Components/Sidebar'
 import React from 'react'
 

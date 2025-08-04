@@ -1,20 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Home, Orders, Menu, Employees, Customers, Location, Rewards, Signout } from "@/assets/common-icons";
+import {
+  Home,
+  Orders,
+  Menu,
+  Employees,
+  Customers,
+  Location,
+  Rewards,
+  Signout,
+  iconDown,
+} from "@/assets/common-icons";
+
+// It is assumed the above assets are available at the specified paths.
+// For a fully self-contained example, these would be defined here as SVG or other components.
 
 const Sidebar = () => {
   const pathname = usePathname();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   const sidebarLinks = [
     {
       icon: Home,
       link: "/dashboard",
-      label: "Home",
+      label: "Dashboard",
     },
     {
       icon: Orders,
@@ -23,8 +37,13 @@ const Sidebar = () => {
     },
     {
       icon: Menu,
-      link: "/menu",
+      link: "/menu-page",
       label: "Menu",
+      children: [
+        { label: "All Items", link: "/menu-page/new-item" },
+        { label: "Categories", link: "/menu-page/categories" },
+        { label: "Modifiers", link: "/menu-page/modifiers" },
+      ],
     },
     {
       icon: Employees,
@@ -48,6 +67,19 @@ const Sidebar = () => {
     },
   ];
 
+  useEffect(() => {
+    const matchedParent = sidebarLinks.find((item) =>
+      item.children?.some((child) => pathname.startsWith(child.link))
+    );
+    if (matchedParent) {
+      setOpenMenu(matchedParent.label);
+    }
+  }, [pathname, sidebarLinks]);
+
+  const handleToggleSubmenu = (label: string) => {
+    setOpenMenu((prev) => (prev === label ? null : label));
+  };
+
   return (
     <>
       <button
@@ -69,20 +101,70 @@ const Sidebar = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            {sidebarLinks.map(({ icon, link, label }) => (
-              <Link
-                key={label}
-                href={link}
-                className={`group flex items-center gap-2 px-3 py-2 rounded-md hover:bg-primary transition-all ${
-                  pathname === link ? "bg-primary text-white bh-primary" : ""
-                }`}
-              >
-                <span className="group-hover:text-white">{icon}</span>
-                <span className="group-hover:text-white">{label}</span>
-              </Link>
-            ))}
+            {sidebarLinks.map(({ icon, link, label, children }) => {
+              const isActive =
+                pathname === link ||
+                (children && children.some((child) => pathname.startsWith(child.link)));
+
+              return (
+                <div key={label}>
+                  <Link
+                    href={link}
+                    className={`group flex items-center justify-between px-3 py-2 rounded-md transition-all cursor-pointer ${
+                      isActive ? "bg-primary text-white" : "text-gray-600 hover:bg-primary hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="group-hover:text-white">{icon}</span>
+                      <span className="group-hover:text-white">{label}</span>
+                    </div>
+
+                    {/* The submenu toggle is now a separate element to avoid conflicting with the Link navigation */}
+                    {children && (
+                      <span
+                        className={`transition-transform duration-300 ${
+                          openMenu === label ? "rotate-180" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault(); // Prevents the Link from navigating when the arrow is clicked
+                          handleToggleSubmenu(label);
+                        }}
+                      >
+                        {iconDown}
+                      </span>
+                    )}
+                  </Link>
+
+                  {children && openMenu === label && (
+                    <div className="ml-8 mt-1 flex flex-col gap-1">
+                      {children.map((child) => {
+                        const childActive = pathname === child.link;
+                        return (
+                          <Link
+                            key={child.label}
+                            href={child.link}
+                            className={`block px-2 py-1 rounded-md transition-all text-sm ${
+                              childActive
+                                ? "text-primary font-medium"
+                                : "text-gray-600 hover:text-primary"
+                            }`}
+                          >
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <div className="pl-2 hover:text-white hover:bg-primary p-2 cursor-pointer rounded-md"><a href="/" className="flex gap-2">{Signout} Signout</a></div>
+
+          <div className="pl-2 hover:text-white hover:bg-primary p-2 cursor-pointer rounded-md">
+            <a href="/" className="flex gap-2 items-center">
+              {Signout} Signout
+            </a>
+          </div>
         </div>
       </aside>
     </>

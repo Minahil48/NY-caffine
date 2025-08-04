@@ -1,4 +1,4 @@
-import OtpPage from '@/Components/Signuppage/Otp'
+import OtpPage from '@/Components/Signinpage/Otp'
 import React from 'react'
 
 function page() {

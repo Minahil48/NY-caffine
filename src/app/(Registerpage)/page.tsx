@@ -1,6 +1,6 @@
-import ForgetPassword from '@/Components/Signuppage/ForgetPassword'
-import OtpPage from '@/Components/Signuppage/Otp'
-import SignupForm from '@/Components/Signuppage/SignupForm'
+import ForgetPassword from '@/Components/Signinpage/ForgetPassword'
+import OtpPage from '@/Components/Signinpage/Otp'
+import SignupForm from '@/Components/Signinpage/SigninForm'
 import React from 'react'
 
 function Page() {

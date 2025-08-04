@@ -1,193 +1,203 @@
-import { Change, Eye, Trash } from '@/assets/common-icons';
-import React from 'react';
+'use client';
 
-interface Product {
-  name: string;
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getStatusDotColor } from '@/app/utilis/statusColor';
+import { nextIcon, previousIcon } from '@/assets/common-icons';
+
+interface DynamicTableProps {
+    data: Record<string, any>[];
+    icons?: React.ReactNode[];
+    maxArrayItemsShown?: number;
+    rowKeyPrefix?: string;
+    getRowHref?: (row: Record<string, any>) => string; // NEW prop
 }
 
-interface Order {
-  id: string;
-  placedOn: string;
-  qty: number;
-  products: Product[];
-  price: string;
-  status: 'Pending' | 'Completed' | 'Canceled';
-}
-
-interface OrderTableProps {
-  data: Order[];
-}
-
-const getProductStyle = (name: string) => {
-  const colorMap: { [key: string]: { bg: string; color: string; bcolor:string } } = {
-    'Iced Latte': { bg: '#F9F5FF', color: '#8B5CF6', bcolor:"#E9D7FE" },
-    'Donuts': { bg: '#EFF8FF', color: '#2563EB', bcolor:"#B2DDFF" },
-    'Croissant': { bg: '#EEF4FF', color: '#1E40AF', bcolor:"#C7D7FE" },
-    'Coffee': { bg: '#F59E0B', color: '#B45309', bcolor:"#B45309" },
-    'Tea': { bg: '#10B981', color: '#065F46', bcolor:"#065F46'" },
-    'Sandwich': { bg: '#6366F1', color: '#312E81', bcolor:"#312E81" },
-  };
-
-  return colorMap[name] || { bg: '#E5E7EB', color: '#374151' };
+const getProductStyleByIndex = (index: number) => {
+    const styles = [
+        { bg: '#F9F5FF', color: '#8B5CF6', bcolor: '#E9D7FE' },
+        { bg: '#EFF8FF', color: '#2563EB', bcolor: '#B2DDFF' },
+        { bg: '#EEF4FF', color: '#1E40AF', bcolor: '#C7D7FE' },
+        { bg: '#FEF3C7', color: '#92400E', bcolor: '#FDE68A' },
+        { bg: '#D1FAE5', color: '#065F46', bcolor: '#6EE7B7' },
+        { bg: '#E0E7FF', color: '#312E81', bcolor: '#A5B4FC' },
+    ];
+    return styles[index % styles.length];
 };
 
-const OrderTable: React.FC<OrderTableProps> = ({ data }) => {
-  const getStatusDotColor = (status: Order['status']) => {
-    switch (status) {
-      case 'Pending':
-        return 'bg-yellow-500';
-      case 'Completed':
-        return 'bg-green-500';
-      case 'Canceled':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
+const DynamicTable: React.FC<DynamicTableProps> = ({
+    data,
+    icons = [],
+    maxArrayItemsShown = 3,
+    rowKeyPrefix = 'row-',
+    getRowHref,
+}) => {
+    const router = useRouter();
+    
+    const handleRowClick = (row: Record<string, any>) => {
+        if (getRowHref) {
+            const href = getRowHref(row);
+            router.push(href);
+        }
+    };
 
-  return (
-      <table className="min-w-full divide-y divide-gray-200 border-1 border-gray-200 rounded-2xl">
-        <thead className="bg-secondary">
-          <tr>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider rounded-tl-lg">ID</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider">Placed on</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider">Qty</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider">Product(s)</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider">Price</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider">Status</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-800 uppercase tracking-wider rounded-tr-lg">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {data.map((order) => (
-            <tr key={order.id} className="hover:bg-gray-50">
-              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{order.placedOn}</td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{order.qty}</td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+    const headers = data.length > 0 ? Object.keys(data[0]) : [];
+    const [sortedData, setSortedData] = useState(data);
+
+    const renderCell = (value: any, key: string, index: number) => {
+        if (Array.isArray(value)) {
+            return (
                 <div className="flex flex-wrap gap-1">
-                  {order.products.slice(0, 3).map((product, index) => {
-                    const { bg, color, bcolor } = getProductStyle(product.name);
-                    return (
-                      <span
-                        key={index}
-                        className="px-2 py-1 rounded-full text-xs font-semibold border"
-                        style={{
-                          backgroundColor: bg,
-                          borderColor: bcolor,
-                          color: color,
-                        }}
-                      >
-                        {product.name}
-                      </span>
-                    );
-                  })}
-                  {order.products.length > 3 && (
-                    <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
-                      +{order.products.length - 3}
-                    </span>
-                  )}
+                    {value.slice(0, maxArrayItemsShown).map((item, i) => {
+                        const { bg, color, bcolor } = getProductStyleByIndex(i);
+                        return (
+                            <span
+                                key={i}
+                                className="px-2 py-1 rounded-full text-xs font-semibold border"
+                                style={{ backgroundColor: bg, borderColor: bcolor, color: color }}
+                            >
+                                {typeof item === 'object' ? item.name ?? JSON.stringify(item) : item}
+                            </span>
+                        );
+                    })}
+                    {value.length > maxArrayItemsShown && (
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
+                            +{value.length - maxArrayItemsShown}
+                        </span>
+                    )}
                 </div>
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{order.price}</td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm">
+            );
+        }
+
+        if (key.toLowerCase() === 'status') {
+            return (
                 <span className="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-lg border border-gray-300 text-gray-700">
-                  <span className={`w-2 h-2 rounded-full mr-1 ${getStatusDotColor(order.status)}`}></span>
-                  {order.status}
+                    <span className={`w-2 h-2 rounded-full mr-1 ${getStatusDotColor(value)}`}></span>
+                    {value}
                 </span>
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div className="flex items-center space-x-3">
-                  <button className="text-gray-400 hover:text-gray-600" >{Trash}</button>
-                  <button className="text-gray-400 hover:text-gray-600" >{Eye}</button>
-                  <button className="text-gray-400 hover:text-gray-600" >{Change}</button>
+            );
+        }
+
+        if (key.toLowerCase().includes('date')) {
+            return <span className="text-sm text-gray-600">{new Date(value).toLocaleDateString()}</span>;
+        }
+
+        return <span className="text-sm text-gray-600">{value}</span>;
+    };
+
+    const sortAscending = (key: string) => {
+        const sorted = [...sortedData].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));
+        setSortedData(sorted);
+    };
+
+    const sortDescending = (key: string) => {
+        const sorted = [...sortedData].sort((a, b) => (a[key] > b[key] ? -1 : a[key] < b[key] ? 1 : 0));
+        setSortedData(sorted);
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="overflow-x-auto rounded-lg border border-gray-200 hidden md:block">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-secondary">
+                        <tr>
+                            {headers.map((text, i) => (
+                                <th
+                                    key={i}
+                                    className={`px-4 py-3 text-left text-sm font-bold text-gray-600 tracking-wider ${i === 0 ? 'rounded-tl-lg' : ''}`}
+                                >
+                                    {text}
+                                </th>
+                            ))}
+                            <th className="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {sortedData.map((row, i) => (
+                            <tr
+                                key={`${rowKeyPrefix}${i}`}
+                                className="hover:bg-gray-50 cursor-pointer"
+                                onClick={() => handleRowClick(row)} // Updated to pass row
+                            >
+                                {headers.map((key, j) => (
+                                    <td key={j} className="px-4 py-8">
+                                        {renderCell(row[key], key, j)}
+                                    </td>
+                                ))}
+                                <td className="px-4 py-8 flex space-x-4 justify-center items-center">
+                                    {icons.map((icon, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="text-gray-500 hover:text-gray-700"
+                                        >
+                                            {icon}
+                                        </button>
+                                    ))}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-between px-4 py-4">
+                    <button className="flex items-center space-x-1 text-sm text-gray-700 font-medium border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-100">
+                        {previousIcon}
+                        <span>Previous</span>
+                    </button>
+
+                    <div className="flex items-center space-x-1">
+                        {[1, 2, 3, '...', 8, 9, 10].map((num, i) => (
+                            <button
+                                key={i}
+                                className={`px-3 py-1 text-sm ${num === 1
+                                    ? 'text-black'
+                                    : 'text-gray-700 border-gray-300 hover:bg-gray-100'
+                                    }`}
+                            >
+                                {num}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button className="flex items-center space-x-1 text-sm text-gray-700 font-medium border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-100">
+                        <span>Next</span>
+                        {nextIcon}
+                    </button>
                 </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-  );
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-4">
+                {sortedData.map((row, i) => (
+                    <div
+                        key={`${rowKeyPrefix}${i}`}
+                        onClick={() => handleRowClick(row)} // Updated to pass row
+                        className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2"
+                    >
+                        {headers.map((key, j) => (
+                            <div key={j} className="text-sm text-gray-600">
+                                <strong>{key}: </strong>
+                                {renderCell(row[key], key, j)}
+                            </div>
+                        ))}
+                        <div className="flex justify-end space-x-3 pt-2">
+                            {icons.map((icon, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    {icon}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
 
-const Table: React.FC = () => {
-  const orders: Order[] = [
-    {
-      id: '019938',
-      placedOn: '14 April,2025',
-      qty: 3,
-      products: [
-        { name: 'Iced Latte' },
-        { name: 'Donuts' },
-        { name: 'Croissant' },
-      ],
-      price: '$90.00',
-      status: 'Pending',
-    },
-    {
-      id: '820921',
-      placedOn: '14 April,2025',
-      qty: 2,
-      products: [
-        { name: 'Iced Latte' },
-        { name: 'Croissant' },
-      ],
-      price: '$90.00',
-      status: 'Completed',
-    },
-    {
-      id: '728107',
-      placedOn: '14 April,2025',
-      qty: 5,
-      products: [
-        { name: 'Iced Latte' },
-        { name: 'Donuts' },
-        { name: 'Croissant' },
-        { name: 'Coffee' },
-        { name: 'Tea' },
-      ],
-      price: '$90.00',
-      status: 'Canceled',
-    },
-    {
-      id: '738117',
-      placedOn: '14 April,2025',
-      qty: 2,
-      products: [
-        { name: 'Iced Latte' },
-        { name: 'Donuts' },
-      ],
-      price: '$90.00',
-      status: 'Pending',
-    },
-    {
-      id: '904490',
-      placedOn: '14 April,2025',
-      qty: 1,
-      products: [
-        { name: 'Iced Latte' },
-      ],
-      price: '$90.00',
-      status: 'Completed',
-    },
-    {
-      id: '567105',
-      placedOn: '14 April,2025',
-      qty: 4,
-      products: [
-        { name: 'Iced Latte' },
-        { name: 'Donuts' },
-        { name: 'Croissant' },
-        { name: 'Sandwich' },
-      ],
-      price: '$90.00',
-      status: 'Pending',
-    },
-  ];
-
-  return (
-        <OrderTable data={orders} />
-  );
-};
-
-export default Table;
+export default DynamicTable;

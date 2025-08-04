@@ -8,6 +8,7 @@ interface CardProps {
   icon?: ReactNode;
   bgColor: string;
   textColor: string;
+  borderColor?: string;
 }
 
 function Card({
@@ -18,9 +19,13 @@ function Card({
   icon,
   bgColor,
   textColor,
+  borderColor = '#e5e7eb',
 }: CardProps) {
   return (
-    <div className="flex flex-col gap-4 bg-white rounded-2xl p-6 sm:p-8 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-[280px] ml-3">
+    <div
+      className="flex flex-col gap-4 bg-white rounded-2xl p-6 sm:p-8 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-[280px] m-0"
+      style={{ border: `1px solid ${borderColor}` }}
+    >
       <div className="flex gap-4 items-center">
         <div className="text-gray-600 text-md font-medium">{heading}</div>
         <div

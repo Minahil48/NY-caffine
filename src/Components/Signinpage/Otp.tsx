@@ -1,4 +1,5 @@
-"use client"
+'use client';
+
 import React, { useRef, useState } from "react";
 import Column1 from "../Column1";
 import Button from "../Button";
@@ -25,11 +26,14 @@ function OtpPage() {
         }
     };
 
+    const isOtpFilled = otp.every((digit) => digit !== "");
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const enteredOtp = otp.join("");
         if (enteredOtp.length === 4) {
             console.log("Verifying OTP:", enteredOtp);
+            location.href = '/reset-password';
         } else {
             alert("Please enter a valid 4-digit code");
         }
@@ -38,7 +42,6 @@ function OtpPage() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
             <Column1 />
-
 
             <div className="flex flex-col items-center justify-center py-20 bg-white relative">
                 <a href="/forget-password" className="absolute top-10 left-10 text-gray-700 text-lg font-medium cursor-pointer">
@@ -49,9 +52,10 @@ function OtpPage() {
                     <h2 className="text-3xl font-semibold mb-2 text-gray-800">Enter OTP</h2>
                     <div className="flex gap-1">
                         <p className="text-black text-lg mb-8">Code sent to</p>
-                        <p className="text-primary text-lg mb-8">amnaemad@gmail.com</p></div>
+                        <p className="text-primary text-lg mb-8">amnaemad@gmail.com</p>
+                    </div>
 
-                    <p className="text-gray-600 text-lg mb-8 self-start">Enter 4 digit code</p>
+                    <p className="text-gray-600 text-xl mb-8 self-start">Enter 4 digit code</p>
 
                     <div className="flex justify-center gap-4 mb-10">
                         {otp.map((digit, index) => (
@@ -63,14 +67,18 @@ function OtpPage() {
                                 value={digit}
                                 onChange={(e) => handleChange(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
-                                className="w-16 h-16 border border-gray-300 rounded-lg text-center text-3xl font-bold text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary"
+                                className="w-16 h-16 border border-gray-300 rounded-lg text-center text-3xl font-medium text-gray-600 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary"
                             />
                         ))}
                     </div>
-                    <div className="flex justify-center">
-                        <Button onClick={() => (location.href = '/')} value="Verify" />
-                    </div>
 
+                    <div className="flex justify-center w-full">
+                        <Button
+                            type="submit"
+                            value="Verify"
+                            className={`w-full ${!isOtpFilled ? "opacity-50 cursor-not-allowed" : ""}`}
+                        />
+                    </div>
                 </form>
             </div>
         </div>

@@ -1,11 +1,18 @@
-"use client";
-import React, { useState } from "react";
+'use client';
 
-const tabs = ["All Orders", "Pending", "Canceled", "Completed"];
+import React from 'react';
 
-export const OrderTabs: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("All Orders");
+const tabs = ['All Orders', 'Pending', 'Canceled', 'Completed'];
 
+interface OrderTabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export const OrderTabs: React.FC<OrderTabsProps> = ({
+  activeTab,
+  setActiveTab,
+}) => {
   return (
     <div className="flex gap-4 text-sm font-medium text-gray-500">
       {tabs.map((tab) => (
@@ -14,8 +21,8 @@ export const OrderTabs: React.FC = () => {
           onClick={() => setActiveTab(tab)}
           className={`border-b-2 pb-1 ${
             activeTab === tab
-              ? "text-primary border-primary"
-              : "border-transparent hover:text-primary"
+              ? 'text-primary border-primary cursor-pointer'
+              : 'border-transparent hover:text-primary cursor-pointer'
           }`}
         >
           {tab}
