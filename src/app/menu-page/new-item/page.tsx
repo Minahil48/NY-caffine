@@ -1,5 +1,5 @@
 import Header from '@/Components/Header'
-import AddItem from '@/Components/Menu/New-Item/AddItem'
+import Form from '@/Components/Menu/New-Item/Form'
 import Sidebar from '@/Components/Sidebar'
 import React from 'react'
 
@@ -10,7 +10,7 @@ function page() {
                 <div><Sidebar /></div>
                 <div className='flex flex-col gap-3 p-4 justify-center'>
                     <Header heading='Menu' subheading='Manage your menu from here' />
-                    <AddItem/>
+                    <Form/>
                 </div>
             </div>
         </div>

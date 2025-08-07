@@ -42,7 +42,6 @@ const Sidebar = () => {
       children: [
         { label: "All Items", link: "/menu-page/new-item" },
         { label: "Categories", link: "/menu-page/categories" },
-        { label: "Modifiers", link: "/menu-page/modifiers" },
       ],
     },
     {
@@ -83,7 +82,7 @@ const Sidebar = () => {
   return (
     <>
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-md shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary rounded-md shadow-md"
         onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
         aria-label="Toggle sidebar"
       >
@@ -97,7 +96,7 @@ const Sidebar = () => {
       >
         <div className="flex flex-col gap-12">
           <div className="flex items-center justify-center">
-            <Image src="/logo.svg" alt="Logo" width={60} height={40} />
+            <Image src="/logo.svg" alt="Logo" width={80} height={80} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -110,7 +109,7 @@ const Sidebar = () => {
                 <div key={label}>
                   <Link
                     href={link}
-                    className={`group flex items-center justify-between px-3 py-2 rounded-md transition-all cursor-pointer ${
+                    className={`group flex items-center justify-between px-3 py-2 rounded-md cursor-pointer ${
                       isActive ? "bg-primary text-white" : "text-gray-600 hover:bg-primary hover:text-white"
                     }`}
                   >
@@ -118,15 +117,13 @@ const Sidebar = () => {
                       <span className="group-hover:text-white">{icon}</span>
                       <span className="group-hover:text-white">{label}</span>
                     </div>
-
-                    {/* The submenu toggle is now a separate element to avoid conflicting with the Link navigation */}
                     {children && (
                       <span
                         className={`transition-transform duration-300 ${
                           openMenu === label ? "rotate-180" : ""
                         }`}
                         onClick={(e) => {
-                          e.preventDefault(); // Prevents the Link from navigating when the arrow is clicked
+                          e.preventDefault();
                           handleToggleSubmenu(label);
                         }}
                       >

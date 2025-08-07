@@ -19,9 +19,9 @@ interface Order {
 const LocationSection: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
-    const [showAddCard, setShowAddCard] = useState(false); 
+    const [showAddCard, setShowAddCard] = useState(false);
 
-    const orders: Order[] = [
+    const [tableData, setTableData] = useState<Order[]>([
         {
             BranchCode: 'NY-8900',
             BranchName: 'NY Caffeine California',
@@ -52,28 +52,31 @@ const LocationSection: React.FC = () => {
             BranchName: 'NY Caffeine London',
             Address: 'Main Boulevard, Street 18, London',
         },
-    ];
-
-    const filteredOrders = orders.filter(order =>
+    ]);
+    const addRowToTable = (newData: Order) => {
+        setTableData((prevData) => [...prevData, newData]);
+    };
+    const filteredOrders = tableData.filter(order =>
         order.BranchCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedLocation ? order.Address === selectedLocation : true)
     );
-
+    const actionIcons = [
+        { icon: Trash, action: 'delete' },
+        { icon: edit, action: 'edit' },
+    ];
     return (
         <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
             <div className="flex w-full justify-between">
                 <h1 className="text-xl font-medium">Branches</h1>
-                <button onClick={() => setShowAddCard(true)}>
-                    <AddButton label="+ Add New Branch" />
-                </button>
+                <AddButton label="+ Add New Branch" onClick={() => setShowAddCard(true)} />
             </div>
-            
+
 
             <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2">
                     <OrderFilters
                         label="By Location"
-                        options={[...new Set(orders.map(o => o.Address))]}
+                        options={[...new Set(tableData.map(o => o.Address))]}
                         selected={selectedLocation}
                         onSelect={(val) => setSelectedLocation(val)}
                     />
@@ -89,10 +92,10 @@ const LocationSection: React.FC = () => {
 
             <OrderTable
                 data={filteredOrders}
-                icons={[Trash, edit]}
+                icons={actionIcons}
                 getRowHref={(row) => `/order-details`}
             />
-            {showAddCard && <AddBranch onClose={() => setShowAddCard(false)} />}
+            {showAddCard && <AddBranch onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
         </div>
     );
 };

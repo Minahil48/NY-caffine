@@ -1,15 +1,19 @@
-import React from 'react'
+import React from 'react';
 
 interface ButtonProps {
-    label:string;
+  label: string;
+  onClick?: () => void;
 }
 
-function AddButton({label}:ButtonProps) {
+function AddButton({ label, onClick }: ButtonProps) {
   return (
-    <div className='flex px-4 py-2 rounded-lg bg-primary text-white items-center justify-center hover:bg-gray-300 hover:text-black'>
+    <button
+      onClick={onClick}
+      className="flex px-4 py-2 rounded-lg cursor-pointer bg-primary text-white items-center justify-center hover:bg-gray-300 hover:text-black transition-all"
+    >
       {label}
-    </div>
-  )
+    </button>
+  );
 }
 
-export default AddButton
+export default AddButton;

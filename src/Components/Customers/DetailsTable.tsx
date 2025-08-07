@@ -8,6 +8,7 @@ interface Items {
 }
 
 interface Order {
+  id: string;
   Branch: string;
   PlacedOn: string;
   Items: Items[];
@@ -17,6 +18,7 @@ interface Order {
 const DetailsTable: React.FC = () => {
   const orders: Order[] = [
     {
+      id: '1',
       Branch: 'NY Caffeine London',
       PlacedOn: '12 April, 2025 - 12:00 am',
       Items: [
@@ -26,6 +28,7 @@ const DetailsTable: React.FC = () => {
       Price: '$81.90',
     },
     {
+      id: '2',
       Branch: 'NY Caffeine London',
       PlacedOn: '12 April, 2025 - 12:00 am',
       Items: [
@@ -35,6 +38,7 @@ const DetailsTable: React.FC = () => {
       Price: '$81.90',
     },
     {
+      id: '3',
       Branch: 'NY Caffeine California',
       PlacedOn: '12 April, 2025 - 12:00 am',
       Items: [
@@ -44,6 +48,7 @@ const DetailsTable: React.FC = () => {
       Price: '$81.90',
     },
     {
+      id: '4',
       Branch: 'NY Caffeine California',
       PlacedOn: '12 April, 2025 - 12:00 am',
       Items: [
@@ -52,6 +57,11 @@ const DetailsTable: React.FC = () => {
       ],
       Price: '$81.90',
     },
+  ];
+
+  const actionIcons = [
+    { icon: Trash, action: 'delete' },
+    { icon: Eye, action: 'view' },
   ];
 
   return (
@@ -66,8 +76,9 @@ const DetailsTable: React.FC = () => {
 
       <DynamicTable
         data={orders}
-        icons={[Trash, Eye]}
-        getRowHref={(row) => `/customers/customer-order-details`} />
+        icons={actionIcons}
+        getRowHref={(row) => `/customers/customer-order-details/${row.id}`}
+      />
     </div>
   );
 };

@@ -1,93 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Trash, Eye, Change } from '@/assets/common-icons';
+import { orders } from '@/app/data/order';
 import { OrderTabs } from './OrderTabs';
 import OrderFilters from './OrderFilters';
 import { OrderSearch } from './OrderSearch';
-import OrderTable from './OrderTable';
-import { Trash, Eye, Change } from '@/assets/common-icons';
-
-interface Product {
-  name: string;
-}
-
-interface Order {
-  ID: string;
-  Date: string;
-  Quantity: number;
-  Products: Product[];
-  Price: string;
-  Status: 'Pending' | 'Completed' | 'Canceled';
-}
-
-const parseOrderDate = (dateStr: string): Date => {
-  return new Date(dateStr);
-};
+import DynamicTable from './OrderTable';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const OrderSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('All Orders');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
-
-  const orders: Order[] = [
-    {
-      ID: '019938',
-      Date: '14 April, 2025',
-      Quantity: 3,
-      Products: [{ name: 'Iced Latte' }, { name: 'Donuts' }, { name: 'Croissant' }],
-      Price: '$90.00',
-      Status: 'Pending',
-    },
-    {
-      ID: '820921',
-      Date: '14 April, 2025',
-      Quantity: 2,
-      Products: [{ name: 'Iced Latte' }, { name: 'Croissant' }],
-      Price: '$90.00',
-      Status: 'Completed',
-    },
-    {
-      ID: '728107',
-      Date: '14 April, 2025',
-      Quantity: 5,
-      Products: [{ name: 'Iced Latte' }, { name: 'Donuts' }, { name: 'Croissant' }, { name: 'Coffee' }, { name: 'Tea' }],
-      Price: '$90.00',
-      Status: 'Canceled',
-    },
-    {
-      ID: '738117',
-      Date: '11 April, 2025',
-      Quantity: 2,
-      Products: [{ name: 'Iced Latte' }, { name: 'Donuts' }],
-      Price: '$90.00',
-      Status: 'Pending',
-    },
-    {
-      ID: '904490',
-      Date: '14 April, 2025',
-      Quantity: 1,
-      Products: [{ name: 'Iced Latte' }],
-      Price: '$90.00',
-      Status: 'Completed',
-    },
-    {
-      ID: '567105',
-      Date: '15 April, 2025',
-      Quantity: 4,
-      Products: [{ name: 'Iced Latte' }, { name: 'Donuts' }, { name: 'Croissant' }, { name: 'Sandwich' }],
-      Price: '$80.00',
-      Status: 'Pending',
-    },
-  ];
 
   const productOptions = Array.from(
     new Set(orders.flatMap(order => order.Products.map(p => p.name)))
   );
 
-  const statusOptions = Array.from(new Set(orders.map(order => order.Status)));
-  const dateOptions = Array.from(new Set(orders.map(order => order.Date)));
+  const formatDate = (date: Date) => {
+    return date.toISOString().split('T')[0];
+  };
 
   let filtered = activeTab === 'All Orders'
     ? orders
@@ -100,30 +35,65 @@ const OrderSection: React.FC = () => {
   }
 
   if (selectedDate) {
-    filtered = filtered.filter(order => order.Date === selectedDate);
+    const formatted = formatDate(selectedDate);
+    filtered = filtered.filter(order => order.Date === formatted);
   }
 
-  if (selectedStatus) {
-    filtered = filtered.filter(order => order.Status === selectedStatus);
+  if (selectedProduct) {
+    filtered = filtered.filter(order =>
+      order.Products.some(product =>
+        product.name.toLowerCase() === selectedProduct.toLowerCase()
+      )
+    );
   }
+
+  const actionIcons = [
+    { icon: Trash, action: 'delete' },
+    { icon: Eye, action: 'view' },
+    { icon: Change, action: 'toggleStatus' },
+  ];
 
   return (
     <div className="flex flex-col gap-5 m-2 bg-white p-6 rounded-2xl">
       <OrderTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
-        <div className="flex flex-wrap gap-2">
-          <OrderFilters label="By Date" options={dateOptions} onSelect={setSelectedDate} />
-          <OrderFilters label="By Product" options={productOptions} onSelect={setSelectedProduct} />
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex flex-col">
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date: Date | null) => setSelectedDate(date)}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Date"
+              className="border border-gray-300 text-gray-700 text-medium max-w-[100px] p-2 rounded-md text-sm"
+              maxDate={new Date()}
+            />
+          </div>
 
+          <OrderFilters
+            label="By Product"
+            options={productOptions}
+            selected={selectedProduct}
+            onSelect={setSelectedProduct}
+          />
         </div>
+
         <div className="w-full md:w-auto">
           <OrderSearch value={searchTerm} onChange={setSearchTerm} />
         </div>
       </div>
 
-      <OrderTable data={filtered} icons={[Trash, Eye, Change]}
-       getRowHref={(row) => `/order-details`} />
+      {filtered.length > 0 ? (
+        <DynamicTable
+          data={filtered}
+          icons={actionIcons}
+          getRowHref={(row) => `/order-details/${row.ID}`}
+        />
+      ) : (
+        <div className="text-center text-gray-500 font-medium py-10">
+          No data for this date.
+        </div>
+      )}
     </div>
   );
 };

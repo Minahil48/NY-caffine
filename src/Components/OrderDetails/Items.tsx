@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 
 interface ItemsProps {
-  total: number;
+  total: string;
   imageSrc: string;
   altText: string;
   heading: string;
@@ -10,7 +10,16 @@ interface ItemsProps {
   Modifiers: string[];
 }
 
-const Items: React.FC<ItemsProps> = ({ total, imageSrc, altText, heading, Qty, Modifiers }) => {
+const Items: React.FC<ItemsProps> = ({
+  total,
+  imageSrc,
+  altText,
+  heading,
+  Qty,
+  Modifiers,
+}) => {
+  const parsedTotal = parseFloat(total);
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 bg-[#FBFBFB] rounded-2xl border border-gray-300 p-4">
       <div className="flex-shrink-0">
@@ -26,7 +35,9 @@ const Items: React.FC<ItemsProps> = ({ total, imageSrc, altText, heading, Qty, M
       <div className="flex flex-col gap-2 w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm sm:text-base">
           <h3 className="font-semibold">{heading}</h3>
-          <span className="text-gray-800 font-medium">${total.toFixed(2)}</span>
+          <span className="text-gray-800 font-medium">
+            ${parsedTotal.toFixed(2)}
+          </span>
         </div>
 
         <p className="text-sm text-gray-500">Qty: {Qty}</p>

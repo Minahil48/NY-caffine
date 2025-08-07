@@ -4,19 +4,45 @@ import React, { useState } from 'react';
 import { CloseEyeIcon, EyeIcon } from "@/assets/common-icons";
 import Column1 from '../Column1';
 import Button from '../Button';
+import axios, { AxiosResponse } from 'axios';
+import { useRouter } from 'next/navigation';
 
-function SignupForm() {
+type User = {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+};
+
+function SigninForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter()
 
   const isValid = email.trim() !== '' && password.trim() !== '';
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isValid) {
-      location.href = '/dashboard';
+
+    if (!isValid) return;
+
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
     }
+  axios.post<unknown>(`http://localhost:4000/api/auth/login`,{
+    email: email,
+    password: password,
+    fcmToken: "null"
+  } )
+    .then((res: AxiosResponse<any>) => {
+      console.log(res);
+      console.log(res.data);
+      if(res.data.success){ 
+        router.push("/dashboard")
+      }
+    });
   };
 
   return (
@@ -88,4 +114,4 @@ function SignupForm() {
   );
 }
 
-export default SignupForm;
+export default SigninForm;

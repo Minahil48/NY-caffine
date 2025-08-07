@@ -1,11 +1,11 @@
-const MenuLayout = ({ children }: Readonly<{
-  children: React.ReactNode;
-}>) => {
-  return (
-    <div className="flex flex-col w-full h-full">
-      {children}
-    </div>
-  )
-}
+import { MenuProvider } from "../../Components/Menu/context/MenuContext";
 
-export default MenuLayout
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+      <div>
+        <MenuProvider>
+          {children}
+        </MenuProvider>
+      </div>
+  );
+}

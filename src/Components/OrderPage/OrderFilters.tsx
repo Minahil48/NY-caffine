@@ -1,7 +1,7 @@
 'use client';
 
-import { iconDown } from '@/assets/common-icons';
 import React, { useState, useRef, useEffect } from 'react';
+import { iconDown } from '@/assets/common-icons';
 
 interface DateFilterDropdownProps {
   label: string;
@@ -30,10 +30,10 @@ const OrderFilters: React.FC<DateFilterDropdownProps> = ({
   }, []);
 
   return (
-    <div className="relative max-w-[130px]" ref={dropdownRef}>
+    <div className="relative max-w-[190px]" ref={dropdownRef}>
       <div
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex whitespace-nowrap gap-2 cursor-pointer text-gray-400 items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+        className="flex gap-2 cursor-pointer text-gray-400 items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
       >
         <span>{selected || label}</span>
         {iconDown}

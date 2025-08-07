@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { getStatusDotColor } from '@/app/utilis/statusColor';
 import { nextIcon, previousIcon } from '@/assets/common-icons';
 
 interface DynamicTableProps {
     data: Record<string, any>[];
-    icons?: React.ReactNode[];
+     icons?: { icon: React.ReactNode; action: string }[];
     maxArrayItemsShown?: number;
     rowKeyPrefix?: string;
-    getRowHref?: (row: Record<string, any>) => string; // NEW prop
+    getRowHref?: (row: Record<string, any>) => string;
 }
 
 const getProductStyleByIndex = (index: number) => {
@@ -33,8 +33,70 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
     getRowHref,
 }) => {
     const router = useRouter();
-    
-    const handleRowClick = (row: Record<string, any>) => {
+    const [sortedData, setSortedData] = useState(data);
+    const [editingRowId, setEditingRowId] = useState<number | null>(null);
+    const [editedData, setEditedData] = useState<Record<string, any> | null>(null);
+    const [tableData, setTableData] = useState([]);
+   
+
+    useEffect(() => {
+        setSortedData(data);
+    }, [data]);
+
+    const handleDelete = (rowIndex: number) => {
+        setSortedData(sortedData.filter((_, i) => i !== rowIndex));
+    };
+
+    const handleEdit = (rowIndex: number) => {
+        setEditingRowId(rowIndex);
+        setEditedData({ ...sortedData[rowIndex] });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, key: string) => {
+        if (editedData) {
+            setEditedData({ ...editedData, [key]: e.target.value });
+        }
+    };
+
+    const handleSave = (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number) => {
+        if (e.key === 'Enter' && editedData) {
+            const newData = sortedData.map((row, i) => (i === rowIndex ? editedData : row));
+            setSortedData(newData);
+            setEditingRowId(null);
+            setEditedData(null);
+        }
+        if (e.key === 'Escape') {
+            setEditingRowId(null);
+            setEditedData(null);
+        }
+    };
+
+    const handleStatusToggle = (rowIndex: number) => {
+        const row = sortedData[rowIndex];
+        const newStatus = { ...row };
+        const currentStatus = newStatus.Status?.toLowerCase();
+
+        const completionStatuses = ['pending', 'completed', 'canceled'];
+        const activeStatuses = ['active', 'inactive'];
+
+        let statusCycle;
+        if (completionStatuses.includes(currentStatus)) {
+            statusCycle = completionStatuses;
+        } else if (activeStatuses.includes(currentStatus)) {
+            statusCycle = activeStatuses;
+        } else {
+            statusCycle = ['active', 'inactive'];
+        }
+
+        const currentIndex = statusCycle.indexOf(currentStatus);
+        const nextIndex = (currentIndex + 1) % statusCycle.length;
+        newStatus.Status = statusCycle[nextIndex].charAt(0).toUpperCase() + statusCycle[nextIndex].slice(1);
+
+        const newData = sortedData.map((r, i) => (i === rowIndex ? newStatus : r));
+        setSortedData(newData);
+    };
+
+    const handleView = (row: Record<string, any>) => {
         if (getRowHref) {
             const href = getRowHref(row);
             router.push(href);
@@ -42,9 +104,22 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
     };
 
     const headers = data.length > 0 ? Object.keys(data[0]) : [];
-    const [sortedData, setSortedData] = useState(data);
 
-    const renderCell = (value: any, key: string, index: number) => {
+    const renderCell = (value: any, key: string, index: number, rowIndex: number) => {
+        const isEditing = editingRowId === rowIndex;
+
+        if (isEditing && key !== 'id') {
+            return (
+                <input
+                    type="text"
+                    value={editedData?.[key] || ''}
+                    onChange={(e) => handleInputChange(e, key)}
+                    onKeyDown={(e) => handleSave(e, rowIndex)}
+                    className="w-full px-2 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+            );
+        }
+
         if (Array.isArray(value)) {
             return (
                 <div className="flex flex-wrap gap-1">
@@ -78,25 +153,12 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
             );
         }
 
-        if (key.toLowerCase().includes('date')) {
-            return <span className="text-sm text-gray-600">{new Date(value).toLocaleDateString()}</span>;
-        }
-
         return <span className="text-sm text-gray-600">{value}</span>;
-    };
-
-    const sortAscending = (key: string) => {
-        const sorted = [...sortedData].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));
-        setSortedData(sorted);
-    };
-
-    const sortDescending = (key: string) => {
-        const sorted = [...sortedData].sort((a, b) => (a[key] > b[key] ? -1 : a[key] < b[key] ? 1 : 0));
-        setSortedData(sorted);
     };
 
     return (
         <div className="space-y-4">
+            {/* Desktop View */}
             <div className="overflow-x-auto rounded-lg border border-gray-200 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-secondary">
@@ -109,58 +171,76 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                                     {text}
                                 </th>
                             ))}
-                            <th className="px-4 py-3"></th>
+                            <th className="px-4 py-3 text-center text-sm font-bold text-gray-600 tracking-wider rounded-tr-lg">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {sortedData.map((row, i) => (
-                            <tr
-                                key={`${rowKeyPrefix}${i}`}
-                                className="hover:bg-gray-50 cursor-pointer"
-                                onClick={() => handleRowClick(row)} // Updated to pass row
-                            >
+                            <tr key={`${rowKeyPrefix}${i}`} className="hover:bg-gray-50">
                                 {headers.map((key, j) => (
                                     <td key={j} className="px-4 py-8">
-                                        {renderCell(row[key], key, j)}
+                                        {renderCell(row[key], key, i, i)}
                                     </td>
                                 ))}
                                 <td className="px-4 py-8 flex space-x-4 justify-center items-center">
-                                    {icons.map((icon, idx) => (
+                                    {icons?.map((iconConfig, idx) => (
                                         <button
                                             key={idx}
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="text-gray-500 hover:text-gray-700"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                switch (iconConfig.action) {
+                                                    case 'delete':
+                                                        handleDelete(i);
+                                                        break;
+                                                    case 'edit':
+                                                        handleEdit(i);
+                                                        break;
+                                                    case 'view':
+                                                        handleView(row);
+                                                        break;
+                                                    case 'toggleStatus':
+                                                        handleStatusToggle(i);
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            }}
+                                            className="p-2 rounded-md transition-all duration-200 text-gray-500 hover:text-blue-600 hover:bg-gray-100 hover:shadow cursor-pointer"
+
                                         >
-                                            {icon}
+                                            {iconConfig.icon}
                                         </button>
                                     ))}
+                                    {editingRowId === i && (
+                                        <button
+                                            onClick={() => { setEditingRowId(null); setEditedData(null); }}
+                                            className="text-gray-500 hover:text-gray-700"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-
-                {/* Pagination */}
                 <div className="flex items-center justify-between px-4 py-4">
                     <button className="flex items-center space-x-1 text-sm text-gray-700 font-medium border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-100">
                         {previousIcon}
                         <span>Previous</span>
                     </button>
-
                     <div className="flex items-center space-x-1">
                         {[1, 2, 3, '...', 8, 9, 10].map((num, i) => (
                             <button
                                 key={i}
-                                className={`px-3 py-1 text-sm ${num === 1
-                                    ? 'text-black'
-                                    : 'text-gray-700 border-gray-300 hover:bg-gray-100'
-                                    }`}
+                                className={`px-3 py-1 text-sm ${num === 1 ? 'text-black' : 'text-gray-700 border-gray-300 hover:bg-gray-100'}`}
                             >
                                 {num}
                             </button>
                         ))}
                     </div>
-
                     <button className="flex items-center space-x-1 text-sm text-gray-700 font-medium border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-100">
                         <span>Next</span>
                         {nextIcon}
@@ -168,30 +248,54 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                 </div>
             </div>
 
-            {/* Mobile Cards */}
+            {/* Mobile View */}
             <div className="md:hidden space-y-4">
                 {sortedData.map((row, i) => (
-                    <div
-                        key={`${rowKeyPrefix}${i}`}
-                        onClick={() => handleRowClick(row)} // Updated to pass row
-                        className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2"
-                    >
+                    <div key={`${rowKeyPrefix}${i}`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
                         {headers.map((key, j) => (
                             <div key={j} className="text-sm text-gray-600">
                                 <strong>{key}: </strong>
-                                {renderCell(row[key], key, j)}
+                                {renderCell(row[key], key, i, i)}
                             </div>
                         ))}
                         <div className="flex justify-end space-x-3 pt-2">
-                            {icons.map((icon, idx) => (
+                            {icons?.map((iconConfig, idx) => (
                                 <button
                                     key={idx}
-                                    onClick={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        switch (iconConfig.action) {
+                                            case 'delete':
+                                                handleDelete(i);
+                                                break;
+                                            case 'edit':
+                                                handleEdit(i);
+                                                break;
+                                            case 'view':
+                                                handleView(row);
+                                                break;
+                                            case 'toggleStatus':
+                                                handleStatusToggle(i);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }}
                                     className="text-gray-500 hover:text-gray-700"
                                 >
-                                    {icon}
+                                    {iconConfig.icon}
                                 </button>
                             ))}
+                            {editingRowId === i && (
+                                <button
+                                    onClick={() => { setEditingRowId(null); setEditedData(null); }}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

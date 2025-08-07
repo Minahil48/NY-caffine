@@ -10,9 +10,7 @@ interface InputFieldProps {
   placeholder?: string;
 }
 
-
 const CardsInput: React.FC<InputFieldProps> = ({
-    
   label,
   required = false,
   value,
@@ -20,14 +18,14 @@ const CardsInput: React.FC<InputFieldProps> = ({
   placeholder = '',
 }) => {
   return (
-    <div className="flex flex-col space-y-1 w-[400px]">
+    <div className="flex flex-col space-y-1 w-full">
       <label className="text-sm text-black">
         {label}
         {required && <span className="text-red-500"> *</span>}
       </label>
       <input
         type="text"
-        className="px-4 py-2 border border-gray-200 rounded-md outline-none"
+        className="px-4 py-2 border border-gray-200 rounded-md outline-none w-full"
         value={value}
         onChange={onChange}
         placeholder={placeholder}

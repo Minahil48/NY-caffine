@@ -3,92 +3,32 @@
 import React, { useState } from 'react';
 import OrderFilters from '../OrderPage/OrderFilters';
 import { OrderSearch } from '../OrderPage/OrderSearch';
-import OrderTable from '../OrderPage/OrderTable';
 import { edit, Trash } from '@/assets/common-icons';
 import AddButton from './AddButton';
 import Link from 'next/link';
-
-interface Product {
-  name: string;
-}
-
-interface Order {
-  Name: string;
-  Price: string;
-  Category: string;
-  Modifiers: Product[];
-  Qty: number;
-  status: 'Active' | 'Inactive';
-}
+import DynamicTable from '../OrderPage/OrderTable';
+import { useMenu } from './context/MenuContext';
 
 const MenuSection: React.FC = () => {
+  const { menuItems } = useMenu();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  const orders: Order[] = [
-    {
-      Name: 'Latte',
-      Price: '$90.00',
-      Category: 'Iced Coffee',
-      Modifiers: [{ name: 'Dairy' }, { name: 'Decaf' }, { name: 'Non-Diary' }],
-      Qty: 23,
-      status: 'Active',
-    },
-    {
-      Name: 'Mocha',
-      Price: '$90.00',
-      Category: 'Iced Coffee',
-      Modifiers: [{ name: 'Dairy' }, { name: 'Decaf' }, { name: 'Non-Diary' }],
-      Qty: 43,
-      status: 'Active',
-    },
-    {
-      Name: 'Mocha',
-      Price: '$90.00',
-      Category: 'Iced Coffee',
-      Modifiers: [{ name: 'Dairy' }, { name: 'Decaf' }, { name: 'Non-Diary' }],
-      Qty: 10,
-      status: 'Inactive',
-    },
-    {
-      Name: 'Hot Chocalate',
-      Price: '$90.00',
-      Category: 'Milkshake',
-      Modifiers: [{ name: 'Dairy' }, { name: 'Decaf' }, { name: 'Non-Diary' }],
-      Qty: 19,
-      status: 'Active',
-    },
-    {
-      Name: 'Americano',
-      Price: '$90.00',
-      Category: 'Milkshake',
-      Modifiers: [{ name: 'Dairy' }, { name: 'Decaf' }, { name: 'Non-Diary' }],
-      Qty: 4,
-      status: 'Inactive',
-    },
-    {
-      Name: 'Espresso',
-      Price: '$90.00',
-      Category: 'Milkshake',
-      Modifiers: [{ name: 'Dairy' }, { name: 'Decaf' }, { name: 'Non-Diary' }],
-      Qty: 8,
-      status: 'Active',
-    },
-  ];
-
   const handleFilterChange = (label: string, value: string) => {
-    if (label === 'By Category') {
-      setSelectedCategory(value);
-    } else if (label === 'In Stock') {
-      setSelectedStatus(value);
-    }
+    if (label === 'By Category') setSelectedCategory(value);
+    else if (label === 'In Stock') setSelectedStatus(value);
   };
 
-  const filteredOrders = orders.filter(order =>
+  const actionIcons = [
+    { icon: Trash, action: 'delete' },
+    { icon: edit, action: 'edit' },
+  ];
+
+  const filteredOrders = menuItems.filter(order =>
     order.Name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedCategory ? order.Category === selectedCategory : true) &&
-    (selectedStatus ? order.status === selectedStatus : true)
+    (!selectedCategory || order.Category === selectedCategory) &&
+    (!selectedStatus || order.status === selectedStatus)
   );
 
   return (
@@ -115,14 +55,16 @@ const MenuSection: React.FC = () => {
             onSelect={(val) => handleFilterChange('In Stock', val)}
           />
         </div>
-
         <div className="w-full md:w-auto">
           <OrderSearch value={searchTerm} onChange={setSearchTerm} />
         </div>
       </div>
 
-      <OrderTable data={filteredOrders} icons={[Trash, edit]}
-       getRowHref={(row) => `/order-details`} />
+      <DynamicTable
+        data={filteredOrders}
+        icons={actionIcons}
+        getRowHref={(row) => `/order-details/${row.Name}`}
+      />
     </div>
   );
 };
