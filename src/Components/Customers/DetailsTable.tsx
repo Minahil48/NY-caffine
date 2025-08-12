@@ -1,7 +1,7 @@
 'use client';
 
 import { DownloadIcon, Eye, Trash } from '@/assets/common-icons';
-import DynamicTable from '@/Components/OrderPage/OrderTable';
+import DynamicTable from '@/components/order/Table';
 
 interface Items {
   name: string;

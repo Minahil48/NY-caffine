@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Order, initialMenuOrders } from '@/app/data/menu';
+import { Order, initialMenuOrders } from '@/lib/static-data/menu';
 
 interface MenuContextType {
   menuItems: Order[];

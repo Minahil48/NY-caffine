@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { edit, Trash } from '@/assets/common-icons';
+import OrderFilters from '@/components/order/Filters';
+import { OrderSearch } from '@/components/order/Search';
+import DynamicTable from '@/components/order/Table';
+import AddCard from './AddCard';
 import AddButton from '../AddButton';
-import OrderFilters from '@/Components/OrderPage/OrderFilters';
-import { OrderSearch } from '@/Components/OrderPage/OrderSearch';
-import DynamicTable from '@/Components/OrderPage/OrderTable';
-import Addcard from './Addcard';
 
 interface Order {
   ID: string;
@@ -66,7 +66,7 @@ const CategorySection: React.FC = () => {
 
       <DynamicTable data={filteredOrders} icons={actionIcons} />
       {showAddCard && (
-        <Addcard onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />
+        <AddCard onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />
       )}
     </div>
   );

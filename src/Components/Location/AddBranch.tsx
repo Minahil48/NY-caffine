@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import CardsInput from '@/Components/CardsInput';
-import AddButton from '../Menu/AddButton';
+import CardsInput from '@/components/CardsInput';
+import AddButton from '../menu/AddButton';
 
 interface AddCardProps {
   onClose: () => void;
-  onAddRow: (newData: { BranchCode: string; BranchName: string; Address: string}) => void;
+  onAddRow: (newData: { branchCode: string; name: string; address: string }) => void;
 }
 
 const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
@@ -46,12 +46,11 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
 
   const handleSubmit = () => {
     if (validate()) {
-      const newRow = {
-        BranchName: branchName,
-        BranchCode: branchCode,
-        Address: address,
-      };
-      onAddRow(newRow);
+      onAddRow({
+        branchCode: branchCode.trim(),
+        name: branchName.trim(),
+        address: address.trim(),
+      });
       onClose();
     }
   };
@@ -60,8 +59,10 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
     <div className="fixed inset-0 backdrop-blur-[1px] flex items-center justify-center z-50 px-4">
       <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl relative w-full max-w-md sm:max-w-lg lg:w-115">
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-2 right-3 text-gray-600 hover:text-black text-2xl"
+          aria-label="Close"
         >
           ×
         </button>
@@ -74,7 +75,7 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               label="Branch Name"
               required
               value={branchName}
-              onChange={(e) => setBranchName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBranchName(e.target.value)}
               placeholder="London Branch"
             />
             {errors.branchName && <p className="text-red-500 text-sm mt-1">{errors.branchName}</p>}
@@ -85,7 +86,7 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               label="Branch Code"
               required
               value={branchCode}
-              onChange={(e) => setBranchCode(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBranchCode(e.target.value)}
               placeholder="NY-123"
             />
             {errors.branchCode && <p className="text-red-500 text-sm mt-1">{errors.branchCode}</p>}
@@ -96,7 +97,7 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               label="Branch Address"
               required
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}
               placeholder="Enter address"
             />
             {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}

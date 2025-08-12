@@ -1,7 +1,7 @@
-import ResetPassword from '@/Components/Signinpage/ResetPassword'
+import ResetPassword from '@/components/sign-in/ResetPassword'
 import React from 'react'
 
-function page() {
+function ResetPasswordPage() {
   return (
     <div>
      <ResetPassword/>
@@ -9,4 +9,4 @@ function page() {
   )
 }
 
-export default page
+export default ResetPasswordPage

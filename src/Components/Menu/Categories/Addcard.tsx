@@ -1,10 +1,9 @@
 'use client';
 
-import CardsInput from '@/Components/CardsInput';
+import CardsInput from '@/components/CardsInput';
 import React, { useState } from 'react';
-import DropDown from '../New-Item/ImageDropDown';
+import ImageDropDown from '../new-item/ImageDropDown';
 import AddButton from '../AddButton';
-import ImageDropDown from '../New-Item/ImageDropDown';
 
 interface AddCardProps {
   onClose: () => void;

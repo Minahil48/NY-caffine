@@ -1,103 +1,147 @@
 'use client';
 
-import React, { useState } from 'react';
-import OrderFilters from '../OrderPage/OrderFilters';
-import { OrderSearch } from '../OrderPage/OrderSearch';
-import OrderTable from '../OrderPage/OrderTable';
+import React, { useState, useEffect } from 'react';
+import OrderFilters from '../order/Filters';
+import { OrderSearch } from '../order/Search';
+import OrderTable from '../order/Table';
 import { edit, Trash } from '@/assets/common-icons';
-import Link from 'next/link';
-import AddButton from '../Menu/AddButton';
-import AddCard from '../Menu/Categories/Addcard';
+import AddButton from '../menu/AddButton';
 import AddBranch from './AddBranch';
 
-interface Order {
-    BranchCode: string;
-    BranchName: string;
-    Address: string;
+import { getAllLocations, addLocations } from '@/lib/api/location/location';
+
+interface LocationType {
+  branchCode: string;
+  name: string;
+  address: string;
 }
 
 const LocationSection: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedLocation, setSelectedLocation] = useState('');
-    const [showAddCard, setShowAddCard] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [showAddCard, setShowAddCard] = useState(false);
+  const [tableData, setTableData] = useState<LocationType[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const [tableData, setTableData] = useState<Order[]>([
-        {
-            BranchCode: 'NY-8900',
-            BranchName: 'NY Caffeine California',
-            Address: 'Main Boulevard, Street 18, London',
-        },
-        {
-            BranchCode: 'TX-7800',
-            BranchName: 'NY Caffeine California',
-            Address: 'Main Boulevard, Street 18, London',
-        },
-        {
-            BranchCode: 'CA-5600',
-            BranchName: 'NY Caffine Amsterdam',
-            Address: 'Main Boulevard, Street 18 Downtown Amsterdam',
-        },
-        {
-            BranchCode: 'FL-1200',
-            BranchName: 'Florida Coffee',
-            Address: 'Ocean Drive, Miami',
-        },
-        {
-            BranchCode: 'NY-8900',
-            BranchName: 'NY Caffeine Scotland',
-            Address: 'Langdon Square Area, Lane 5, Scotland',
-        },
-        {
-            BranchCode: 'NY-8900',
-            BranchName: 'NY Caffeine London',
-            Address: 'Main Boulevard, Street 18, London',
-        },
-    ]);
-    const addRowToTable = (newData: Order) => {
-        setTableData((prevData) => [...prevData, newData]);
+  useEffect(() => {
+    async function fetchLocations() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await getAllLocations();
+        if (res.success && Array.isArray(res.data)) {
+          setTableData(res.data);
+        } else {
+          setError('Failed to load locations');
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to load locations');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLocations();
+  }, []);
+
+  const addRowToTable = async (newData: {
+    branchCode?: string;
+    name?: string;
+    address?: string;
+  }) => {
+    const { branchCode, name, address } = newData;
+
+    if (!branchCode || !name || !address) {
+      setError('Invalid data received from AddBranch');
+      return;
+    }
+
+    setError(null);
+
+    const payload = {
+      branchCode: branchCode.trim(),
+      name: name.trim(),
+      address: address.trim(),
+      email: 'branchIsb@gmail.com',        // required string
+      password: 'Test1234',                // required string
+      image: 'default-image.jpg',          // required string
+      latitude: 0,
+      longitude: 0,
     };
-    const filteredOrders = tableData.filter(order =>
-        order.BranchCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedLocation ? order.Address === selectedLocation : true)
-    );
-    const actionIcons = [
-        { icon: Trash, action: 'delete' },
-        { icon: edit, action: 'edit' },
-    ];
-    return (
-        <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
-            <div className="flex w-full justify-between">
-                <h1 className="text-xl font-medium">Branches</h1>
-                <AddButton label="+ Add New Branch" onClick={() => setShowAddCard(true)} />
-            </div>
 
+    console.log('Sending payload:', payload);
 
-            <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
-                <div className="flex gap-2">
-                    <OrderFilters
-                        label="By Location"
-                        options={[...new Set(tableData.map(o => o.Address))]}
-                        selected={selectedLocation}
-                        onSelect={(val) => setSelectedLocation(val)}
-                    />
-                </div>
+    try {
+      const res = await addLocations(payload);
+      if (res.success && res.data) {
+        setTableData((prev) => [
+          ...prev,
+          {
+            branchCode: res.data.branchCode,
+            name: res.data.name,
+            address: res.data.address,
+          },
+        ]);
+        setShowAddCard(false);
+        setError(null);
+      } else {
+        setError('Failed to add location');
+      }
+    } catch (err: any) {
+      const errorMessage = err.response?.data
+        ? JSON.stringify(err.response.data)
+        : err.message || 'Failed to add location';
+      setError(`Failed to add location: ${errorMessage}`);
+    }
+  };
 
-                <div className="w-full md:w-auto">
-                    <OrderSearch
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                    />
-                </div>
-            </div>
+  const filteredOrders = tableData.filter(
+    (order) =>
+      order.branchCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedLocation ? order.address === selectedLocation : true)
+  );
 
-            <OrderTable
-                data={filteredOrders}
-                icons={actionIcons}
-                getRowHref={(row) => `/order-details`}
-            />
-            {showAddCard && <AddBranch onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
+  const mappedData = filteredOrders.map((item) => ({
+    branchCode: item.branchCode,
+    branchName: item.name,
+    address: item.address,
+  }));
+
+  const actionIcons = [
+    { icon: Trash, action: 'delete' },
+    { icon: edit, action: 'edit' },
+  ];
+
+  if (loading) return <p>Loading locations...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  return (
+    <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
+      <div className="flex w-full justify-between">
+        <h1 className="text-xl font-medium">Branches</h1>
+        <AddButton label="+ Add New Branch" onClick={() => setShowAddCard(true)} />
+      </div>
+
+      <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
+        <div className="flex gap-2">
+          <OrderFilters
+            label="By Location"
+            options={[...new Set(tableData.map((o) => o.address))]}
+            selected={selectedLocation}
+            onSelect={setSelectedLocation}
+          />
         </div>
-    );
+
+        <div className="w-full md:w-auto">
+          <OrderSearch value={searchTerm} onChange={setSearchTerm} />
+        </div>
+      </div>
+
+      <OrderTable data={mappedData} icons={actionIcons} getRowHref={() => `/order-details`} />
+
+      {showAddCard && <AddBranch onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
+    </div>
+  );
 };
 
 export default LocationSection;

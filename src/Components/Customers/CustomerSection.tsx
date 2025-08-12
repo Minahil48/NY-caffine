@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { edit, Trash, Eye } from '@/assets/common-icons';
-import { OrderSearch } from '@/Components/OrderPage/OrderSearch';
-import DynamicTable from '@/Components/OrderPage/OrderTable';
+import { OrderSearch } from '@/components/order/Search';
+import DynamicTable from '@/components/order/Table';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 

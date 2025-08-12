@@ -1,7 +1,7 @@
-import ForgetPassword from '@/Components/Signinpage/ForgetPassword'
+import ForgetPassword from '@/components/sign-in/ForgetPassword'
 import React from 'react'
 
-function Page() {
+function ForgetPasswordPage() {
   return (
     <div>
       <ForgetPassword/>
@@ -9,4 +9,4 @@ function Page() {
   )
 }
 
-export default Page
+export default ForgetPasswordPage

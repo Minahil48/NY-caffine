@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import CardsInput from '@/Components/CardsInput';
-import AddButton from '../Menu/AddButton';
+import CardsInput from '@/components/CardsInput';
+import AddButton from '../menu/AddButton';
 import { Calender } from '@/assets/common-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';

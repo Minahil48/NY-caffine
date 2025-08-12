@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { edit, Trash } from '@/assets/common-icons';
-import OrderFilters from '@/Components/OrderPage/OrderFilters';
-import { OrderSearch } from '@/Components/OrderPage/OrderSearch';
-import DynamicTable from '@/Components/OrderPage/OrderTable';
-import AddButton from '../Menu/AddButton';
+import OrderFilters from '@/components/order/Filters';
+import { OrderSearch } from '@/components/order/Search';
+import DynamicTable from '@/components/order/Table';
+import AddButton from '../menu/AddButton';
 import AddEmployee from './AddEmployee';
 
 interface Order {

@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import OrderFilters from '../OrderPage/OrderFilters';
-import { OrderSearch } from '../OrderPage/OrderSearch';
+import OrderFilters from '../order/Filters';
+import { OrderSearch } from '../order/Search';
 import { edit, Trash } from '@/assets/common-icons';
-import AddButton from './AddButton';
 import Link from 'next/link';
-import DynamicTable from '../OrderPage/OrderTable';
+import DynamicTable from '../order/Table';
 import { useMenu } from './context/MenuContext';
+import AddButton from './AddButton';
 
 const MenuSection: React.FC = () => {
   const { menuItems } = useMenu();

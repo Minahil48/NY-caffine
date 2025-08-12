@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Order } from '@/app/data/menu';
+import { Order } from '@/lib/static-data/menu';
 import { iconDown, leftArrow } from '@/assets/common-icons';
-import { useMenu } from '../context/MenuContext';
 import Link from 'next/link';
+import { useMenu } from '../context/MenuContext';
 import ImageDropDown from './ImageDropDown';
 
 const Form = () => {
@@ -120,7 +120,7 @@ const Form = () => {
     );
 
     return (
-        <div className="bg-white sm:p-8 w-full flex flex-col gap-3 rounded-2xl">
+        <div className="bg-white p-8 flex flex-col gap-3 rounded-2xl m-4">
             <div className="flex justify-between items-center mb-8">
                 <Link href="/menu-page" className="text-xl flex items-center text-gray-800 hover:text-primary">
                     {leftArrow} <span className="ml-2">Add New Item</span>
