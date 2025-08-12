@@ -36,9 +36,9 @@ function ForgetPassword() {
 
             if (res.success) {
                 toast.success(res.message);
+                setShouldNavigate(true);
             } else {
                 toast.error(res.message);
-                setShouldNavigate(true);
             }
         } catch (error) {
             toast.error("Something went wrong. Please try again.");

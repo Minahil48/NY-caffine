@@ -1,59 +1,93 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { edit, Trash, Eye } from '@/assets/common-icons';
 import { OrderSearch } from '@/components/order/Search';
 import DynamicTable from '@/components/order/Table';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { getAllCustomers, deleteCustomer } from '@/lib/api/customer/customer';
 
 interface Customer {
-  name: string;
-  contact: string;
-  email: string;
-  date?: string;
+  _id: string;
+  Name: string;
+  Email: string;
+  Date?: string;
 }
 
 const CustomerSection: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState('');
-
-  const customers: Customer[] = [
-    {
-      name: 'Martina Roisse',
-      contact: '+99 890 456124',
-      email: 'martha@gmail.com',
-      date: '2025-08-05',
-    },
-    {
-      name: 'John Doe',
-      contact: '+12 345 678901',
-      email: 'john@example.com',
-      date: '2025-08-04',
-    },
-    {
-      name: 'Alice Smith',
-      contact: '+44 123 456789',
-      email: 'alice@example.com',
-      date: '2025-08-03',
-    },
-  ];
+  const [tableData, setTableData] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0];
   };
 
-  let filteredCustomers = customers.filter((customer) =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const fetchCustomers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getAllCustomers();
+      if (res.success && Array.isArray(res.data)) {
+        const customers = res.data
+          .filter((user: any) => user.role === 'customer')
+          .map((cus: any) => ({
+            _id: cus._id,
+            Name: cus.name,
+            Email: cus.email,
+            Date: cus.createdAt
+              ? new Date(cus.createdAt).toISOString().split('T')[0]
+              : '',
+          }));
+        setTableData(customers);
+      } else {
+        setError('Failed to load customers');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to load customers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (customerId: string) => {
+    if (!confirm('Are you sure you want to delete this customer?')) return;
+    try {
+      const res = await deleteCustomer(customerId);
+      if (!res.success) {
+        console.error('Failed to delete customer:', res.message);
+        return;
+      }
+      setTableData((prev) => prev.filter((cus) => cus._id !== customerId));
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  let filteredCustomers = tableData.filter((customer) =>
+    customer.Name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (selectedDate) {
     const formatted = formatDate(selectedDate);
     filteredCustomers = filteredCustomers.filter(
-      (customer) => customer.date === formatted
+      (customer) => customer.Date === formatted
     );
   }
+
+  const mappedData = filteredCustomers.map((cus) => ({
+    ID: cus._id,
+    Name: cus.Name,
+    Email: cus.Email,
+    Date: cus.Date,
+  }));
 
   const actionIcons = [
     { icon: Trash, action: 'delete' },
@@ -83,10 +117,14 @@ const CustomerSection: React.FC = () => {
         </div>
       </div>
 
+      {loading && <p>Loading customers...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
       <DynamicTable
-        data={filteredCustomers}
+        data={mappedData}
         icons={actionIcons}
-        getRowHref={(row) => `/customers/customer-details`}
+        onDelete={handleDelete}
+        getRowHref={(row) => `/customers/customer-details/${row.ID}`}
       />
     </div>
   );

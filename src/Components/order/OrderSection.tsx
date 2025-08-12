@@ -10,15 +10,11 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { getAllOrders, deleteOrder } from '@/lib/api/orders/order';
 
-interface Product {
-  name: string;
-}
-
 interface Order {
   ID: string;
   Date: string;
   Quantity: number;
-  Products: Product[];
+  Products: string;
   Price: string;
   Status: string;
 }
@@ -51,9 +47,9 @@ const OrderSection: React.FC = () => {
           ID: order._id,
           Date: new Date(order.createdAt).toISOString().split('T')[0],
           Quantity: order.itemsQuantity,
-          Products: order.products.map((p: any) => ({
-            name: p.item || 'Unknown',
-          })),
+          Products: order.products
+            .map((p: any) => p.item?.name || 'Unknown')
+            .join(', '),
           Price: `$${Number(order.totalPrice).toFixed(2)}`,
           Status: order.pickupStatus || 'Pending',
         }));
@@ -84,14 +80,8 @@ const OrderSection: React.FC = () => {
     }
   };
 
-  const handleAction = (action: string, orderId: string) => {
-    if (action === 'delete') {
-      handleDelete(orderId);
-    }
-  };
-
   const productOptions = Array.from(
-    new Set(orders.flatMap(order => order.Products.map(p => p.name)))
+    new Set(orders.flatMap(order => order.Products.split(', ')))
   );
 
   const formatDate = (date: Date) => date.toISOString().split('T')[0];
@@ -113,9 +103,7 @@ const OrderSection: React.FC = () => {
 
   if (selectedProduct) {
     filtered = filtered.filter(order =>
-      order.Products.some(product =>
-        product.name.toLowerCase().includes(selectedProduct.toLowerCase())
-      )
+      order.Products.toLowerCase().includes(selectedProduct.toLowerCase())
     );
   }
 
@@ -170,12 +158,11 @@ const OrderSection: React.FC = () => {
 
       {filtered.length > 0 ? (
         <DynamicTable
-          data={orders}
+          data={filtered}
           icons={actionIcons}
           getRowHref={(row) => `/orders/${row.ID}`}
           onDelete={handleDelete}
         />
-
       ) : (
         <div className="text-center text-gray-500 font-medium py-10">
           No orders found.

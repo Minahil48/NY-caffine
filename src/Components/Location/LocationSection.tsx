@@ -8,9 +8,10 @@ import { edit, Trash } from '@/assets/common-icons';
 import AddButton from '../menu/AddButton';
 import AddBranch from './AddBranch';
 
-import { getAllLocations, addLocations } from '@/lib/api/location/location';
+import { getAllLocations, addLocations, deleteLocations } from '@/lib/api/location/location';
 
 interface LocationType {
+  _id: string;
   branchCode: string;
   name: string;
   address: string;
@@ -24,6 +25,34 @@ const LocationSection: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+
+  const handleDelete = async (locationId: string) => {
+    if (!confirm('Are you sure you want to delete this branch?')) return;
+
+    try {
+      const res = await deleteLocations(locationId);
+
+      if (!res.success) {
+        console.error('Failed to delete branch:', res.message);
+        return;
+      }
+
+      setTableData((prev) => prev.filter((loc) => loc._id !== locationId));
+    } catch (error) {
+      console.error('Error deleting branch:', error);
+    }
+  };
+
+
+  const handleAction = (action: string, locationId: string) => {
+    if (action === 'delete') {
+      handleDelete(locationId);
+    }
+    if (action === 'edit') {
+      console.log('Edit branch:', locationId);
+    }
+  };
+  
   useEffect(() => {
     async function fetchLocations() {
       setLoading(true);
@@ -62,28 +91,18 @@ const LocationSection: React.FC = () => {
       branchCode: branchCode.trim(),
       name: name.trim(),
       address: address.trim(),
-      email: 'branchIsb@gmail.com',        // required string
-      password: 'Test1234',                // required string
-      image: 'default-image.jpg',          // required string
+      email: 'branchIsb@gmail.com',
+      password: 'Test1234',
+      image: 'default-image.jpg',
       latitude: 0,
       longitude: 0,
     };
 
-    console.log('Sending payload:', payload);
-
     try {
       const res = await addLocations(payload);
       if (res.success && res.data) {
-        setTableData((prev) => [
-          ...prev,
-          {
-            branchCode: res.data.branchCode,
-            name: res.data.name,
-            address: res.data.address,
-          },
-        ]);
+        setTableData((prev) => [...prev, res.data]);
         setShowAddCard(false);
-        setError(null);
       } else {
         setError('Failed to add location');
       }
@@ -95,13 +114,15 @@ const LocationSection: React.FC = () => {
     }
   };
 
-  const filteredOrders = tableData.filter(
-    (order) =>
-      order.branchCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedLocation ? order.address === selectedLocation : true)
+  const filteredLocations = tableData.filter(
+    (loc) =>
+      loc.branchCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedLocation ? loc.address === selectedLocation : true)
   );
 
-  const mappedData = filteredOrders.map((item) => ({
+
+  const mappedData = filteredLocations.map((item) => ({
+    ID: item._id,
     branchCode: item.branchCode,
     branchName: item.name,
     address: item.address,
@@ -137,9 +158,18 @@ const LocationSection: React.FC = () => {
         </div>
       </div>
 
-      <OrderTable data={mappedData} icons={actionIcons} getRowHref={() => `/order-details`} />
+      <OrderTable
+        data={mappedData}
+        icons={actionIcons}
+        onDelete={handleDelete}
+      />
 
-      {showAddCard && <AddBranch onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
+      {showAddCard && (
+        <AddBranch
+          onClose={() => setShowAddCard(false)}
+          onAddRow={addRowToTable}
+        />
+      )}
     </div>
   );
 };

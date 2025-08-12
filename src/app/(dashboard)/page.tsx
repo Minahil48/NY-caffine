@@ -9,15 +9,13 @@ import ViewButton from '@/components/ViewButton';
 import DynamicTable from '@/components/order/Table';
 import { getAllOrders, deleteOrder } from '@/lib/api/orders/order';
 
-interface Product {
-  name: string;
-}
+
 
 interface Order {
   ID: string;
   Date: string;
   Quantity: number;
-  Products: Product[];
+  Products: string;
   Price: string;
   Status: string;
 }
@@ -52,9 +50,9 @@ function Page() {
           ID: order._id,
           Date: new Date(order.createdAt).toISOString().split('T')[0],
           Quantity: order.itemsQuantity,
-          Products: order.products.map((p: any) => ({
-            name: p.item || 'Unknown',
-          })),
+          Products: order.products
+            .map((p: any) => p.item?.name || 'Unknown')
+            .join(', '),
           Price: `$${Number(order.totalPrice).toFixed(2)}`,
           Status: order.pickupStatus || 'Pending',
         }));

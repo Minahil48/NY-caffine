@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getStatusDotColor } from '@/lib/utilis/statusColor';
 import { nextIcon, previousIcon } from '@/assets/common-icons';
@@ -11,10 +11,11 @@ interface DynamicTableProps {
     maxArrayItemsShown?: number;
     rowKeyPrefix?: string;
     getRowHref?: (row: Record<string, any>) => string;
-    onDelete?: (rowId: string) => void; // New prop for delete callback
+    onDelete?: (rowId: string) => void;
 }
 
-const getProductStyleByIndex = (index: number) => {
+// Stable product style generator (consistent across reloads)
+const getProductStyleById = (id: string | number) => {
     const styles = [
         { bg: '#F9F5FF', color: '#8B5CF6', bcolor: '#E9D7FE' },
         { bg: '#EFF8FF', color: '#2563EB', bcolor: '#B2DDFF' },
@@ -23,7 +24,14 @@ const getProductStyleByIndex = (index: number) => {
         { bg: '#D1FAE5', color: '#065F46', bcolor: '#6EE7B7' },
         { bg: '#E0E7FF', color: '#312E81', bcolor: '#A5B4FC' },
     ];
-    return styles[index % styles.length];
+
+    const strId = String(id);
+    let hash = 0;
+    for (let i = 0; i < strId.length; i++) {
+        hash = (hash << 5) - hash + strId.charCodeAt(i);
+        hash |= 0;
+    }
+    return styles[Math.abs(hash) % styles.length];
 };
 
 const DynamicTable: React.FC<DynamicTableProps> = ({
@@ -43,7 +51,6 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
         setSortedData(data);
     }, [data]);
 
-    // Remove local deletion - delegate to parent via onDelete
     const handleDelete = (rowIndex: number) => {
         const row = sortedData[rowIndex];
         if (onDelete && row?.ID) {
@@ -109,8 +116,18 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
 
     const headers = data.length > 0 ? Object.keys(data[0]) : [];
 
-    const renderCell = (value: any, key: string, index: number, rowIndex: number) => {
+    const renderCell = (value: any, key: string, rowIndex: number) => {
         const isEditing = editingRowId === rowIndex;
+
+        // Parse JSON strings into objects/arrays
+        if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value);
+                if (Array.isArray(parsed) || typeof parsed === 'object') {
+                    value = parsed;
+                }
+            } catch {}
+        }
 
         if (isEditing && key !== 'id') {
             return (
@@ -124,16 +141,18 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
             );
         }
 
+        // Handle product arrays with stable styles
         if (Array.isArray(value)) {
             return (
                 <div className="flex flex-wrap gap-1">
                     {value.slice(0, maxArrayItemsShown).map((item, i) => {
-                        const { bg, color, bcolor } = getProductStyleByIndex(i);
+                        const uniqueKey = item?.id ?? item?.name ?? i;
+                        const { bg, color, bcolor } = getProductStyleById(uniqueKey);
                         return (
                             <span
                                 key={i}
                                 className="px-2 py-1 rounded-full text-xs font-semibold border"
-                                style={{ backgroundColor: bg, borderColor: bcolor, color: color }}
+                                style={{ backgroundColor: bg, borderColor: bcolor, color }}
                             >
                                 {typeof item === 'object' ? item.name ?? JSON.stringify(item) : item}
                             </span>
@@ -148,6 +167,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
             );
         }
 
+        // Status styling
         if (key.toLowerCase() === 'status') {
             return (
                 <span className="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-lg border border-gray-300 text-gray-700">
@@ -162,7 +182,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
 
     return (
         <div className="space-y-4">
-            {/* Desktop View */}
+            {/* Desktop Table */}
             <div className="overflow-x-auto rounded-lg border border-gray-200 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-secondary">
@@ -175,7 +195,9 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                                     {text}
                                 </th>
                             ))}
-                            <th className="px-4 py-3 text-center text-sm font-bold text-gray-600 tracking-wider rounded-tr-lg">Actions</th>
+                            <th className="px-4 py-3 text-center text-sm font-bold text-gray-600 tracking-wider rounded-tr-lg">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -183,7 +205,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                             <tr key={`${rowKeyPrefix}${i}`} className="hover:bg-gray-50">
                                 {headers.map((key, j) => (
                                     <td key={j} className="px-4 py-8">
-                                        {renderCell(row[key], key, i, i)}
+                                        {renderCell(row[key], key, i)}
                                     </td>
                                 ))}
                                 <td className="px-4 py-8 flex space-x-4 justify-center items-center">
@@ -219,7 +241,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                                             onClick={() => { setEditingRowId(null); setEditedData(null); }}
                                             className="text-gray-500 hover:text-gray-700"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
@@ -229,6 +252,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                         ))}
                     </tbody>
                 </table>
+
+                {/* Pagination */}
                 <div className="flex items-center justify-between px-4 py-4">
                     <button className="flex items-center space-x-1 text-sm text-gray-700 font-medium border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-100">
                         {previousIcon}
@@ -251,14 +276,14 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                 </div>
             </div>
 
-            {/* Mobile View */}
+            {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
                 {sortedData.map((row, i) => (
                     <div key={`${rowKeyPrefix}${i}`} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
                         {headers.map((key, j) => (
                             <div key={j} className="text-sm text-gray-600">
                                 <strong>{key}: </strong>
-                                {renderCell(row[key], key, i, i)}
+                                {renderCell(row[key], key, i)}
                             </div>
                         ))}
                         <div className="flex justify-end space-x-3 pt-2">
@@ -294,7 +319,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                                     onClick={() => { setEditingRowId(null); setEditedData(null); }}
                                     className="text-gray-500 hover:text-gray-700"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
