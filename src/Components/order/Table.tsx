@@ -14,7 +14,6 @@ interface DynamicTableProps {
     onDelete?: (rowId: string) => void;
 }
 
-// Stable product style generator (consistent across reloads)
 const getProductStyleById = (id: string | number) => {
     const styles = [
         { bg: '#F9F5FF', color: '#8B5CF6', bcolor: '#E9D7FE' },
@@ -119,7 +118,6 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
     const renderCell = (value: any, key: string, rowIndex: number) => {
         const isEditing = editingRowId === rowIndex;
 
-        // Parse JSON strings into objects/arrays
         if (typeof value === 'string') {
             try {
                 const parsed = JSON.parse(value);
@@ -141,7 +139,6 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
             );
         }
 
-        // Handle product arrays with stable styles
         if (Array.isArray(value)) {
             return (
                 <div className="flex flex-wrap gap-1">
@@ -167,7 +164,6 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
             );
         }
 
-        // Status styling
         if (key.toLowerCase() === 'status') {
             return (
                 <span className="px-2 py-1 inline-flex items-center text-xs font-semibold rounded-lg border border-gray-300 text-gray-700">
@@ -182,7 +178,9 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
 
     return (
         <div className="space-y-4">
+            
             {/* Desktop Table */}
+
             <div className="overflow-x-auto rounded-lg border border-gray-200 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-secondary">

@@ -136,9 +136,9 @@ function Page() {
         <div className="w-full lg:w-1/3">
           <DoughnutChart
             orderDataByDate={{
-              '2025-08-04': 80,
-              '2025-08-03': 70,
-              '2025-08-02': 30,
+              '2025-08-13': 80,
+              '2025-08-14': 70,
+              '2025-08-15': 30,
             }}
           />
         </div>

@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Order } from '@/lib/static-data/menu';
 import { iconDown, leftArrow } from '@/assets/common-icons';
 import Link from 'next/link';
 import { useMenu } from '../context/MenuContext';
 import ImageDropDown from './ImageDropDown';
+import { AddItem } from '@/lib/api/menu/item';
 
 const Form = () => {
     const router = useRouter();
@@ -18,6 +18,7 @@ const Form = () => {
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedModifiers, setSelectedModifiers] = useState<string[]>([]);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const handleAddItem = (item: string, setter: any, currentItems: string[]) => {
         if (item && !currentItems.includes(item)) {
@@ -30,7 +31,7 @@ const Form = () => {
         setter(currentItems.filter((item) => item !== itemToRemove));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const price = parseFloat(setPrice);
 
         if (selectedBranches.length === 0) {
@@ -48,17 +49,40 @@ const Form = () => {
             return;
         }
 
-        const newItem: Order = {
-            Name: itemName,
-            Price: `$${price.toFixed(2)}`,
-            Category: selectedCategories[0],
-            Modifiers: selectedModifiers.map(name => ({ name })),
-            Qty: Math.floor(Math.random() * 100),
-            status: 'Active',
-        };
+        setLoading(true);
 
-        addMenuItem(newItem);
-        router.push('/menu-page');
+        try {
+            const response = await AddItem({
+                name: itemName,
+                price,
+                category: selectedCategories[0],
+                modifiers: selectedModifiers,
+                branch: selectedBranches,
+                qty: 10,
+                isActive: true,
+                images: [],
+            });
+
+            if (response.success) {
+                addMenuItem({
+                    Name: response.data.name,
+                    Price: `$${response.data.price.toFixed(2)}`,
+                    Category: response.data.category,
+                    Modifiers: response.data.modifiers.map((id: string) => ({ name: id })),
+                    Qty: response.data.qty,
+                    status: response.data.isActive ? 'Active' : 'Inactive',
+                });
+
+                router.push('/menu');
+            } else {
+                alert('Failed to add item: ' + response.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const isFormValid =
@@ -93,7 +117,7 @@ const Form = () => {
         </div>
     );
 
-    const Dropdown = ({ label, options, selected, onSelect, name }: any) => (
+    const Dropdown = ({ label, options, onSelect, name }: any) => (
         <div className="relative max-w-md">
             <button
                 type="button"
@@ -127,10 +151,10 @@ const Form = () => {
                 </Link>
                 <button
                     onClick={handleSubmit}
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || loading}
                     className="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary disabled:opacity-50"
                 >
-                    Add New Inventory
+                    {loading ? 'Adding...' : 'Add New Inventory'}
                 </button>
             </div>
 
@@ -144,7 +168,7 @@ const Form = () => {
                     <Dropdown
                         name="branch"
                         label="Select Branch"
-                        options={['NY California', 'Texas', 'Florida']}
+                        options={['Lahore', 'Islamabad', 'Faisalabad']}
                         selected={selectedBranches}
                         onSelect={(val: string) => handleAddItem(val, setSelectedBranches, selectedBranches)}
                     />
@@ -170,36 +194,37 @@ const Form = () => {
                     <Dropdown
                         name="category"
                         label="Select Category"
-                        options={['Milkshake', 'Iced Coffee']}
+                        options={['For delivery', 'For TakeAway']}
                         selected={selectedCategories}
                         onSelect={(val: string) => handleAddItem(val, setSelectedCategories, selectedCategories)}
                     />
                 </FormGroup>
 
-                    <FormGroup label="Set Price (USD)" isRequired>
-                        <div>
-                            <input
-                                type="number"
-                                className={`block w-full lg:w-[450px] px-4 py-2 border ${parseFloat(setPrice) <= 0 && setPrice !== ''
-                                        ? 'border-red-500'
-                                        : 'border-gray-300'
-                                    } rounded-md`}
-                                placeholder="Enter a price greater than 0"
-                                value={setPrice}
-                                min="1"
-                                step="1"
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (parseFloat(value) >= 0 || value === '') {
-                                        setSetPrice(value);
-                                    }
-                                }}
-                            />
-                            {setPrice !== '' && parseFloat(setPrice) <= 0 && (
-                                <p className="text-red-500 text-sm mt-1">Price must be greater than 0.</p>
-                            )}
-                        </div>
-                    </FormGroup>
+                <FormGroup label="Set Price (USD)" isRequired>
+                    <div>
+                        <input
+                            type="number"
+                            className={`block w-full lg:w-[450px] px-4 py-2 border ${parseFloat(setPrice) <= 0 && setPrice !== ''
+                                ? 'border-red-500'
+                                : 'border-gray-300'
+                                } rounded-md`}
+                            placeholder="Enter a price greater than 0"
+                            value={setPrice}
+                            min="1"
+                            step="1"
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (parseFloat(value) >= 0 || value === '') {
+                                    setSetPrice(value);
+                                }
+                            }}
+                        />
+                        {setPrice !== '' && parseFloat(setPrice) <= 0 && (
+                            <p className="text-red-500 text-sm mt-1">Price must be greater than 0.</p>
+                        )}
+                    </div>
+                </FormGroup>
+
                 <FormGroup
                     label="Modifier"
                     isRequired
@@ -209,7 +234,10 @@ const Form = () => {
                     <Dropdown
                         name="modifier"
                         label="Select Modifier"
-                        options={['Dairy', 'Decaf', 'Non Dairy']}
+                        options={[
+                            'Toppings', 'Milk', 'BlueBerry'
+                        ]
+                        }
                         selected={selectedModifiers}
                         onSelect={(val: string) => handleAddItem(val, setSelectedModifiers, selectedModifiers)}
                     />

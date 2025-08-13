@@ -41,7 +41,7 @@ const Sidebar = () => {
       link: "/menu",
       label: "Menu",
       children: [
-        { label: "All Items", link: "/menu/new-item" },
+        { label: "All Items", link: "/menu" },
         { label: "Categories", link: "/menu/categories" },
       ],
     },

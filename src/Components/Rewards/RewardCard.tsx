@@ -9,7 +9,7 @@ interface ProductCardProps {
 
 const RewardCard: React.FC<ProductCardProps> = ({ imageSrc, title, subtitle, points }) => {
   return (
-    <div className="bg-white border-1 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-[280px]">
+    <div className="bg-white border-1 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-[300px]">
       <Image
         src={imageSrc}
         alt={title}
@@ -17,11 +17,11 @@ const RewardCard: React.FC<ProductCardProps> = ({ imageSrc, title, subtitle, poi
         height={100}
         className=" object-cover rounded-t-xl p-2"
       />
-      <div className="p-4 flex flex-col gap-2">
-        <h3 className="text-md text-gray-800">
+      <div className="p-4 flex flex-col">
+        <h3 className="text-md text-gray-800 mb-3">
           {title}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 min-h-10 mb-3">
           {subtitle}
         </p>
         <ul className="text-sm text-gray-800">
