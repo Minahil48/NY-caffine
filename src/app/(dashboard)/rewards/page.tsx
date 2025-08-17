@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AddButton from '@/components/menu/AddButton';
 import AddReward from '@/components/rewards/AddReward';
 import RewardCard from '@/components/rewards/RewardCard';
+import RewardsShimmer from './loading';
 
 import { getAllRewards, addReward } from '@/lib/api/rewards/reward';
 
@@ -58,7 +59,7 @@ function Page() {
       console.log('Add Reward API response:', res);
 
       if (res.success && res.data) {
-        setRewards(prev => [...prev, res.data]); 
+        setRewards(prev => [...prev, res.data]);
         setShowAddCard(false);
       } else {
         setError("Failed to add reward");
@@ -69,7 +70,7 @@ function Page() {
   };
 
 
-  if (loading) return <p>Loading rewards...</p>;
+  if (loading) return <RewardsShimmer />;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (

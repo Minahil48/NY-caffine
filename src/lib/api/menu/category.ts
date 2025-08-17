@@ -50,3 +50,32 @@ export const deleteCategory= async (CategoryId: string) => {
 
   return res.data;
 };
+
+interface UpdateCategoryData {
+  id: string;
+  name: string;
+  image?: File; // optional image
+}
+
+export const updateCategory = async (data: UpdateCategoryData) => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  try {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    if (data.image) formData.append("image", data.image);
+
+    const res = await axiosInstance.put(`/category/${data.id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res.data;
+  } catch (err: any) {
+    console.error("Failed to update category:", err.response?.data || err.message);
+    return { success: false, message: err.response?.data?.message || err.message };
+  }
+};

@@ -7,12 +7,39 @@ import { OrderSearch } from '@/components/order/Search';
 import DynamicTable from '@/components/order/Table';
 import AddCard from './AddCard';
 import AddButton from '../AddButton';
-import { addCategory, getAllCategory, deleteCategory } from '@/lib/api/menu/category';
+import { addCategory, getAllCategory, deleteCategory, updateCategory } from '@/lib/api/menu/category';
 
 interface Category {
   _id: string;
   name: string;
 }
+
+const CategoryShimmer: React.FC = () => (
+  <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl animate-pulse">
+    <div className="flex w-full justify-between items-center">
+      <div className="h-6 w-1/4 bg-gray-300 rounded"></div>
+      <div className="h-8 w-40 bg-gray-300 rounded"></div>
+    </div>
+    <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center mt-3">
+      <div className="flex justify-between w-full gap-4">
+        <div className="h-10 w-32 bg-gray-200 rounded"></div>
+        <div className="h-10 flex-1 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+    <div className="flex items-center justify-between pb-3 mt-4">
+      <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
+      <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
+      <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
+    </div>
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className="flex items-center justify-between pb-3">
+        <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+        <div className="h-4 w-1/3 bg-gray-200 rounded"></div>
+        <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
+      </div>
+    ))}
+  </div>
+);
 
 const CategorySection: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -31,14 +58,8 @@ const CategorySection: React.FC = () => {
     setError(null);
     try {
       const res = await getAllCategory();
-      console.log('Categories API response:', res);
-
       if (res.success && Array.isArray(res.categories)) {
-        const mappedCategories: Category[] = res.categories.map((cat: any) => ({
-          _id: cat._id,
-          name: cat.name,
-        }));
-        setCategories(mappedCategories);
+        setCategories(res.categories.map((cat: any) => ({ _id: cat._id, name: cat.name })));
       } else {
         setError('Failed to load categories');
       }
@@ -53,31 +74,40 @@ const CategorySection: React.FC = () => {
     if (!confirm('Are you sure you want to delete this category?')) return;
     try {
       const res = await deleteCategory(categoryId);
-      if (!res.success) {
-        console.error('Failed to delete category:', res.message);
-        return;
-      }
+      if (!res.success) return;
       setCategories((prev) => prev.filter((cat) => cat._id !== categoryId));
-    } catch (error) {
-      console.error('Error deleting category:', error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const addRowToTable = async (newCategory: { Name: string }): Promise<void> => {
+  const addRowToTable = async (newCategory: { Name: string }) => {
     try {
       const res = await addCategory({ id: '', name: newCategory.Name });
-      if (res.success && res.data && typeof res.data._id === 'string' && typeof res.data.name === 'string') {
-        const newCat: Category = {
-          _id: res.data._id,
-          name: res.data.name,
-        };
-        setCategories((prev) => [...prev, newCat]);
+      if (res.success && res.data) {
+        setCategories((prev) => [...prev, { _id: res.data._id, name: res.data.name }]);
         setShowAddCard(false);
-      } else {
-        console.error('Failed to add category:', res.message);
       }
     } catch (err) {
-      console.error('Failed to add category:', err);
+      console.error(err);
+    }
+  };
+
+ 
+  const handleEdit = async (updatedRow: Record<string, any>) => {
+    try {
+      const res = await updateCategory({ id: updatedRow.ID, name: updatedRow.Name });
+      if (!res.success) return false;
+
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat._id === updatedRow.ID ? { ...cat, name: updatedRow.Name } : cat
+        )
+      );
+      return true;
+    } catch (err) {
+      console.error('Error updating category:', err);
+      return false;
     }
   };
 
@@ -99,7 +129,7 @@ const CategorySection: React.FC = () => {
     Name: cat.name,
   }));
 
-  if (loading) return <p>Loading categories...</p>;
+  if (loading) return <CategoryShimmer />;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
@@ -115,16 +145,20 @@ const CategorySection: React.FC = () => {
             label="By Product"
             options={productOptions}
             selected={selectedProduct}
-            onSelect={(val: string) => setSelectedProduct(val)}
+            onSelect={setSelectedProduct}
           />
-
           <div className="w-full md:w-auto">
             <OrderSearch value={searchTerm} onChange={setSearchTerm} />
           </div>
         </div>
       </div>
 
-      <DynamicTable data={mappedData} icons={actionIcons} onDelete={handleDelete} />
+      <DynamicTable
+        data={mappedData}
+        icons={actionIcons}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+      />
 
       {showAddCard && <AddCard onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
     </div>

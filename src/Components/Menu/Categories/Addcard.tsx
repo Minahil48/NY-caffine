@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import CardsInput from '@/components/CardsInput';
-import React, { useState } from 'react';
-import ImageDropDown from '../new-item/ImageDropDown';
-import AddButton from '../AddButton';
+import CardsInput from "@/components/CardsInput";
+import React, { useState } from "react";
+import ImageDropDown from "../new-item/ImageDropDown";
+import AddButton from "../AddButton";
 
 interface AddCardProps {
   onClose: () => void;
@@ -11,29 +11,47 @@ interface AddCardProps {
 }
 
 const AddCard: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
-  const [categoryName, setCategoryName] = useState('');
-  const [error, setError] = useState('');
+  const [categoryName, setCategoryName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
-    if (categoryName.trim() === '') {
-      setError('Category name is required.');
+    if (categoryName.trim() === "") {
+      setError("Category name is required.");
       return;
     }
 
-    const newRow = {
-      ID: '#102194',
-      Name: categoryName.trim(),
-      Qty: Math.floor(Math.random() * 50) + 1,
-    };
+    setLoading(true);
 
-    onAddRow(newRow);
-    setError('');
-    onClose();
+    setTimeout(() => {
+      const newRow = {
+        ID: "#102194",
+        Name: categoryName.trim(),
+        Qty: Math.floor(Math.random() * 50) + 1,
+      };
+
+      onAddRow(newRow);
+      setError("");
+      setLoading(false);
+      onClose();
+    }, 1200);
   };
+
+  // 🔹 Skeleton Shimmer
+  const ShimmerContent = () => (
+    <div className="animate-pulse flex flex-col gap-4">
+      <div className="h-6 w-1/3 bg-gray-300 rounded"></div>
+      <div className="h-10 w-full bg-gray-200 rounded"></div>
+      <div className="h-10 w-full bg-gray-200 rounded"></div>
+      <div className="h-12 w-full bg-gray-200 rounded"></div>
+      <div className="h-10 w-1/2 bg-gray-300 rounded self-center"></div>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 backdrop-blur-[1px] flex items-center justify-center z-50 px-4">
       <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl relative w-full max-w-md sm:max-w-lg lg:max-w-[480px]">
+        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-2 right-3 text-gray-600 hover:text-black text-2xl"
@@ -41,28 +59,33 @@ const AddCard: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
           ×
         </button>
 
-        <div className="flex flex-col gap-5">
-          <h2 className="text-xl font-medium mb-4 sm:mb-6">New Category</h2>
+        {/* Loading Shimmer */}
+        {loading ? (
+          <ShimmerContent />
+        ) : (
+          <div className="flex flex-col gap-5">
+            <h2 className="text-xl font-medium mb-4 sm:mb-6">New Category</h2>
 
-          <CardsInput
-            label="Category Name"
-            required
-            value={categoryName}
-            onChange={(e) => {
-              setCategoryName(e.target.value);
-              if (error) setError('');
-            }}
-            placeholder="Iced Mocha"
-          />
+            <CardsInput
+              label="Category Name"
+              required
+              value={categoryName}
+              onChange={(e) => {
+                setCategoryName(e.target.value);
+                if (error) setError("");
+              }}
+              placeholder="Iced Mocha"
+            />
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
 
-          <div className="flex gap-2 items-center justify-center w-full">
-            <ImageDropDown width="w-full lg:w-100" />
-          </div>
+            <div className="flex gap-2 items-center justify-center w-full">
+              <ImageDropDown width="w-full lg:w-100" />
+            </div>
 
             <AddButton label="Add New Category" onClick={handleSubmit} />
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

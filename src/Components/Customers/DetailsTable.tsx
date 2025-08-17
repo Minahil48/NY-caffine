@@ -20,6 +20,38 @@ interface DetailsTableProps {
   customerId: string;
 }
 
+
+const OrdersShimmer: React.FC = () => {
+  return (
+    <div className="animate-pulse flex flex-col gap-4 mt-4">
+
+      <div className="flex w-full justify-between items-center pb-3">
+        <div className="h-5 w-1/4 bg-gray-300 rounded"></div>
+        <div className="h-8 w-28 bg-gray-200 rounded"></div>
+      </div>
+
+      <div className="flex items-center justify-between pb-3 mt-3">
+        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
+        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
+        <div className="h-4 w-1/5 bg-gray-300 rounded"></div>
+        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
+      </div>
+
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between pb-3"
+        >
+          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+          <div className="h-4 w-1/5 bg-gray-200 rounded"></div>
+          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const DetailsTable: React.FC<DetailsTableProps> = ({ customerId }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +67,7 @@ const DetailsTable: React.FC<DetailsTableProps> = ({ customerId }) => {
           Branch: order.branch || "N/A",
           PlacedOn: new Date(order.createdAt).toLocaleString(),
           Items: order.products.map((p: any) => ({
-          name: p.item?.name || "Unnamed Item",
+            name: p.item?.name || "Unnamed Item",
           })),
           Price: `$${order.totalPrice?.toFixed(2) || "0.00"}`,
         }));
@@ -56,23 +88,27 @@ const DetailsTable: React.FC<DetailsTableProps> = ({ customerId }) => {
     { icon: Eye, action: "view" },
   ];
 
-  if (loading) return <div className="p-5">Loading orders...</div>;
-
   return (
     <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
-      <div className="flex w-full justify-between">
-        <h1 className="text-xl font-medium">Customer Orders</h1>
-        <button className="flex gap-1 border-1 text-md text-gray-600 items-center cursor-pointer hover:bg-gray-100 border-gray-200 p-3 rounded-xl">
-          {DownloadIcon}
-          Download
-        </button>
-      </div>
+      {loading ? (
+        <OrdersShimmer />
+      ) : (
+        <>
+          <div className="flex w-full justify-between">
+            <h1 className="text-xl font-medium">Customer Orders</h1>
+            <button className="flex gap-1 border-1 text-md text-gray-600 items-center cursor-pointer hover:bg-gray-100 border-gray-200 p-3 rounded-xl">
+              {DownloadIcon}
+              Download
+            </button>
+          </div>
 
-      <DynamicTable
-        data={orders}
-        icons={actionIcons}
-        getRowHref={(row) => `/orders/${row.id}`}
-      />
+          <DynamicTable
+            data={orders}
+            icons={actionIcons}
+            getRowHref={(row) => `/orders/${row.id}`}
+          />
+        </>
+      )}
     </div>
   );
 };

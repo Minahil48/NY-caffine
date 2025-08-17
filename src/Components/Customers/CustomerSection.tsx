@@ -7,6 +7,7 @@ import DynamicTable from '@/components/order/Table';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { getAllCustomers, deleteCustomer } from '@/lib/api/customer/customer';
+import { UpdateUserDetails } from '@/lib/api/auth/settings/settings';
 
 interface Customer {
   _id: string;
@@ -15,6 +16,43 @@ interface Customer {
   Date?: string;
 }
 
+const CustomerShimmer: React.FC = () => {
+  return (
+    <div className="animate-pulse flex flex-col gap-4 mt-4">
+
+      <div className="flex items-center justify-between w-full pb-3">
+        <div className="h-5 w-1/4 bg-gray-300 rounded"></div>
+        <div className="h-8 w-1/3 bg-gray-200 rounded"></div>
+      </div>
+
+      <div className="flex gap-4 w-full">
+        <div className="h-8 w-28 bg-gray-200 rounded"></div>
+        <div className="h-8 w-40 bg-gray-200 rounded"></div>
+      </div>
+
+
+      <div className="flex items-center justify-between pb-3 mt-3">
+        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
+        <div className="h-4 w-1/4 bg-gray-300 rounded"></div>
+        <div className="h-4 w-1/5 bg-gray-300 rounded"></div>
+        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
+      </div>
+
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between pb-3"
+        >
+          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+          <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
+          <div className="h-4 w-1/5 bg-gray-200 rounded"></div>
+          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const CustomerSection: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -22,9 +60,8 @@ const CustomerSection: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
+  const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -38,32 +75,16 @@ const CustomerSection: React.FC = () => {
             _id: cus._id,
             Name: cus.name,
             Email: cus.email,
-            Date: cus.createdAt
-              ? new Date(cus.createdAt).toISOString().split('T')[0]
-              : '',
+            Date: cus.createdAt ? new Date(cus.createdAt).toISOString().split('T')[0] : '',
           }));
         setTableData(customers);
       } else {
         setError('Failed to load customers');
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to load customers');
+    } catch (err: any) {
+      setError(err.message || 'Failed to load customers');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDelete = async (customerId: string) => {
-    if (!confirm('Are you sure you want to delete this customer?')) return;
-    try {
-      const res = await deleteCustomer(customerId);
-      if (!res.success) {
-        console.error('Failed to delete customer:', res.message);
-        return;
-      }
-      setTableData((prev) => prev.filter((cus) => cus._id !== customerId));
-    } catch (error) {
-      console.error('Error deleting customer:', error);
     }
   };
 
@@ -71,15 +92,46 @@ const CustomerSection: React.FC = () => {
     fetchCustomers();
   }, []);
 
+
+  const handleDelete = async (customerId: string) => {
+    if (!confirm('Are you sure you want to delete this customer?')) return;
+    try {
+      const res = await deleteCustomer(customerId);
+      if (!res.success) return;
+      setTableData((prev) => prev.filter((cus) => cus._id !== customerId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+  const handleEdit = async (updatedRow: Record<string, any>) => {
+    try {
+      const payload = { name: updatedRow.Name, email: updatedRow.Email };
+      const res = await UpdateUserDetails(updatedRow.ID, payload);
+      if (!res.success) return false;
+
+      setTableData((prev) =>
+        prev.map((cus) =>
+          cus._id === updatedRow.ID
+            ? { ...cus, Name: updatedRow.Name, Email: updatedRow.Email }
+            : cus
+        )
+      );
+      return true;
+    } catch (err) {
+      console.error('Error updating customer:', err);
+      return false;
+    }
+  };
+
   let filteredCustomers = tableData.filter((customer) =>
     customer.Name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (selectedDate) {
     const formatted = formatDate(selectedDate);
-    filteredCustomers = filteredCustomers.filter(
-      (customer) => customer.Date === formatted
-    );
+    filteredCustomers = filteredCustomers.filter((customer) => customer.Date === formatted);
   }
 
   const mappedData = filteredCustomers.map((cus) => ({
@@ -97,35 +149,37 @@ const CustomerSection: React.FC = () => {
 
   return (
     <div className="flex flex-col m-2 bg-white rounded-2xl p-7">
-      <div className="flex items-center justify-between w-full pb-4">
-        <h1 className="text-xl font-medium">All Customers</h1>
-        <div>
-          <OrderSearch value={searchTerm} onChange={setSearchTerm} />
-        </div>
-      </div>
+      {loading ? (
+        <CustomerShimmer />
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <>
+          <div className="flex items-center justify-between w-full pb-4">
+            <h1 className="text-xl font-medium">All Customers</h1>
+            <OrderSearch value={searchTerm} onChange={setSearchTerm} />
+          </div>
 
-      <div className="flex flex-row justify-between w-full gap-4 pb-4">
-        <div className="flex flex-col">
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date: Date | null) => setSelectedDate(date)}
-            dateFormat="yyyy-MM-dd"
-            placeholderText="Date"
-            className="border border-gray-300 text-gray-700 text-medium max-w-[100px] p-2 rounded-md text-sm"
-            maxDate={new Date()}
+          <div className="flex flex-row justify-between w-full gap-4 pb-4">
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date: Date | null) => setSelectedDate(date)}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Date"
+              className="border border-gray-300 text-gray-700 text-medium max-w-[100px] p-2 rounded-md text-sm"
+              maxDate={new Date()}
+            />
+          </div>
+
+          <DynamicTable
+            data={mappedData}
+            icons={actionIcons}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            getRowHref={(row) => `/customers/customer-details/${row.ID}`}
           />
-        </div>
-      </div>
-
-      {loading && <p>Loading customers...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      <DynamicTable
-        data={mappedData}
-        icons={actionIcons}
-        onDelete={handleDelete}
-        getRowHref={(row) => `/customers/customer-details/${row.ID}`}
-      />
+        </>
+      )}
     </div>
   );
 };
