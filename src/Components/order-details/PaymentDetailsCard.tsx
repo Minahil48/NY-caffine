@@ -45,10 +45,7 @@ const PaymentDetailsCard: React.FC<PaymentDetailsCardProps> = ({
         {orderItems.map((item, index) => {
           const parsedPrice = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
           return (
-            <div
-              key={index}
-              className="flex justify-between items-center py-2"
-            >
+            <div key={index} className="flex justify-between items-center py-2">
               <span className="text-gray-700">
                 {item.quantity}x {item.name}
               </span>

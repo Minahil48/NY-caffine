@@ -1,16 +1,15 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 const LoadingPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 p-6 animate-pulse bg-gray-50 min-h-screen">
-
       <div className="flex flex-col lg:flex-row gap-6 w-full justify-center">
         {Array.from({ length: 4 }).map((_, idx) => (
           <div
             key={idx}
-            className="w-full lg:w-56 h-32 bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-3"
+            className="w-full lg:w-80 h-45 bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-3"
           >
             <div className="h-5 w-32 bg-gray-200 rounded"></div>
             <div className="h-8 w-24 bg-gray-200 rounded"></div>
@@ -18,7 +17,6 @@ const LoadingPage: React.FC = () => {
           </div>
         ))}
       </div>
-
 
       <div className="flex flex-col lg:flex-row gap-6 mt-6">
         <div className="w-full lg:w-2/3 h-64 bg-white rounded-2xl shadow-sm"></div>
@@ -31,7 +29,6 @@ const LoadingPage: React.FC = () => {
           <div className="h-10 w-32 bg-gray-200 rounded"></div>
         </div>
 
-   
         <div className="flex flex-col gap-3">
           {Array.from({ length: 6 }).map((_, idx) => (
             <div

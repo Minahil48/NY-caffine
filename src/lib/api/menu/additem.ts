@@ -1,37 +1,40 @@
-
 "use server";
 
 import axiosInstance from "@/axiosInstance";
-import { cookies } from "next/headers";
+import getAuthHeaders from "@/authHeader";
 
-export const AddItem = async (itemData: any) => {
-    try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
+interface ItemData {
+  name?: string;
+  description?: string;
+  price?: number;
+  images?: string[];
+  category?: string;
+  modifiers?: any[];
+  branch?: string[];
+  isActive?: boolean;
+  qty?: number;
+}
 
-        const payload = {
-            name: itemData.name || "",
-            description: itemData.description || "",
-            price: itemData.price || 0,
-            images: itemData.images || [],
-            category: itemData.category || "",
-            modifiers: itemData.modifiers || [],
-            branch: itemData.branch || [],
-            isActive: itemData.isActive ?? true,
-            qty: itemData.qty || 0,
-        };
+export const AddItem = async (itemData: ItemData) => {
+  try {
+    const headers = await getAuthHeaders();
 
-        const res = await axiosInstance.post(
-            "/items",
-            payload,
-            {
-                headers: { Authorization: `Bearer ${token}` },
-            }
-        );
+    const payload = {
+      name: itemData.name || "",
+      description: itemData.description || "",
+      price: itemData.price || 0,
+      images: itemData.images || [],
+      category: itemData.category || "",
+      modifiers: itemData.modifiers || [],
+      branch: itemData.branch || [],
+      isActive: itemData.isActive ?? true,
+      qty: itemData.qty || 0,
+    };
 
-        return res.data;
-    } catch (error: any) {
-        console.error("Error adding item:", error.response?.data || error.message);
-        throw error;
-    }
+    const res = await axiosInstance.post("/items", payload, { headers });
+    return res.data;
+  } catch (error: any) {
+    console.error("Error adding item:", error.response?.data || error.message);
+    throw error;
+  }
 };

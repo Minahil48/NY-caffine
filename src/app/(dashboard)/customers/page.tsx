@@ -3,7 +3,7 @@ import Card from '@/components/Card'
 import CustomerSection from '@/components/customers/CustomerSection'
 import React from 'react'
 
-function page() {
+function CustomerPage() {
   return (
     <div className='flex flex-col gap-2'>
       <div className='bg-white flex justify-between rounded-2xl gap-10 p-6 items-center'>
@@ -50,4 +50,4 @@ function page() {
   )
 }
 
-export default page
+export default CustomerPage

@@ -1,12 +1,10 @@
-import Header from '@/components/Header'
 import CategorySection from '@/components/menu/categories/CategorySection'
-import Sidebar from '@/components/Sidebar'
 import React from 'react'
 
-function page() {
+function CategoryPage() {
     return (
         <CategorySection />
     )
 }
 
-export default page
+export default CategoryPage

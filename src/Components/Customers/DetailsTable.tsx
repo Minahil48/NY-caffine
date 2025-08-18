@@ -20,11 +20,9 @@ interface DetailsTableProps {
   customerId: string;
 }
 
-
 const OrdersShimmer: React.FC = () => {
   return (
     <div className="animate-pulse flex flex-col gap-4 mt-4">
-
       <div className="flex w-full justify-between items-center pb-3">
         <div className="h-5 w-1/4 bg-gray-300 rounded"></div>
         <div className="h-8 w-28 bg-gray-200 rounded"></div>
@@ -38,10 +36,7 @@ const OrdersShimmer: React.FC = () => {
       </div>
 
       {Array.from({ length: 5 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center justify-between pb-3"
-        >
+        <div key={i} className="flex items-center justify-between pb-3">
           <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
           <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
           <div className="h-4 w-1/5 bg-gray-200 rounded"></div>

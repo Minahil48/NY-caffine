@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 
 interface CardProps {
   heading: string;
@@ -19,7 +19,7 @@ function Card({
   icon,
   bgColor,
   textColor,
-  borderColor = '#e5e7eb',
+  borderColor = "#e5e7eb",
 }: CardProps) {
   return (
     <div

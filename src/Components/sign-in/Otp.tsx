@@ -23,7 +23,10 @@ function Otp() {
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -48,12 +51,22 @@ function Otp() {
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
       <Column1 />
       <div className="flex flex-col items-center justify-center py-20 bg-white relative">
-        <a href="/forget-password" className="absolute top-10 left-10 text-gray-700 text-lg font-medium cursor-pointer">
+        <a
+          href="/forget-password"
+          className="absolute top-10 left-10 text-gray-700 text-lg font-medium cursor-pointer"
+        >
           &lt; Back
         </a>
-        <form onSubmit={handleSubmit} className="flex flex-col items-center w-full max-w-md px-4">
-          <h2 className="text-3xl font-semibold mb-2 text-gray-800">Enter OTP</h2>
-          <p className="text-gray-600 text-xl mb-8 self-start">Enter 6 digit code sent to {email}</p>
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col items-center w-full max-w-md px-4"
+        >
+          <h2 className="text-3xl font-semibold mb-2 text-gray-800">
+            Enter OTP
+          </h2>
+          <p className="text-gray-600 text-xl mb-8 self-start">
+            Enter 6 digit code sent to {email}
+          </p>
           <div className="flex justify-center gap-4 mb-10">
             {otp.map((digit, index) => (
               <input
@@ -71,7 +84,9 @@ function Otp() {
           <Button
             type="submit"
             value="Verify"
-            className={`w-full ${!isOtpFilled ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`w-full ${
+              !isOtpFilled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           />
         </form>
       </div>

@@ -37,13 +37,17 @@ const DetailsCard: React.FC<DetailsCardProps> = ({ customerId }) => {
         setName(user.name || "");
         setEmail(user.email || "");
         setContact(user.phone || "");
-        setJoinDate(user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "");
+        setJoinDate(
+          user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""
+        );
 
         setOrdersPlaced(orders.length);
         setTotalPayments(
           orders.reduce((sum: number, o: any) => sum + (o.totalPrice || 0), 0)
         );
-        setCanceledOrders(orders.filter((o: any) => o.pickupStatus === "canceled").length);
+        setCanceledOrders(
+          orders.filter((o: any) => o.pickupStatus === "canceled").length
+        );
       } catch (err) {
         console.error("Failed to fetch customer details", err);
       } finally {
@@ -172,11 +176,15 @@ const DetailsCard: React.FC<DetailsCardProps> = ({ customerId }) => {
                     }`}
                   />
                   {contactError && (
-                    <span className="text-sm text-red-600 mt-1">{contactError}</span>
+                    <span className="text-sm text-red-600 mt-1">
+                      {contactError}
+                    </span>
                   )}
                 </>
               ) : (
-                <p className="text-base font-medium text-gray-500 mt-1">{contact}</p>
+                <p className="text-base font-medium text-gray-500 mt-1">
+                  {contact}
+                </p>
               )}
             </div>
 
@@ -196,17 +204,25 @@ const DetailsCard: React.FC<DetailsCardProps> = ({ customerId }) => {
                     }`}
                   />
                   {emailError && (
-                    <span className="text-sm text-red-600 mt-1">{emailError}</span>
+                    <span className="text-sm text-red-600 mt-1">
+                      {emailError}
+                    </span>
                   )}
                 </>
               ) : (
-                <p className="text-base font-medium text-gray-500 mt-1">{email}</p>
+                <p className="text-base font-medium text-gray-500 mt-1">
+                  {email}
+                </p>
               )}
             </div>
 
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-center text-gray-400">Orders Placed</p>
-              <p className="text-base font-medium text-center text-gray-500 mt-1">{ordersPlaced}</p>
+              <p className="text-sm font-medium text-center text-gray-400">
+                Orders Placed
+              </p>
+              <p className="text-base font-medium text-center text-gray-500 mt-1">
+                {ordersPlaced}
+              </p>
             </div>
 
             <div className="flex flex-col">
@@ -217,8 +233,12 @@ const DetailsCard: React.FC<DetailsCardProps> = ({ customerId }) => {
             </div>
 
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-400">Canceled Orders</p>
-              <p className="text-base font-medium text-gray-500 mt-1">{canceledOrders}</p>
+              <p className="text-sm font-medium text-gray-400">
+                Canceled Orders
+              </p>
+              <p className="text-base font-medium text-gray-500 mt-1">
+                {canceledOrders}
+              </p>
             </div>
           </div>
         </div>

@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 const RewardsShimmer: React.FC = () => {
   return (
     <div className="flex flex-col p-5 bg-white rounded-2xl gap-3 animate-pulse">
-
       <div className="flex justify-between mb-5">
         <div className="h-6 w-50 bg-gray-300 rounded"></div>
         <div className="h-10 w-50 bg-gray-300 rounded"></div>

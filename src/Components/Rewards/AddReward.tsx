@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import CardsInput from '@/components/CardsInput';
-import AddButton from '../menu/AddButton';
-import DropDown from '../menu/new-item/ImageDropDown';
-import ImageDropDown from '../menu/new-item/ImageDropDown';
+import React, { useState } from "react";
+import CardsInput from "@/components/CardsInput";
+import AddButton from "../menu/AddButton";
+import DropDown from "../menu/new-item/ImageDropDown";
+import ImageDropDown from "../menu/new-item/ImageDropDown";
 
 interface AddCardProps {
   onClose: () => void;
@@ -17,43 +17,43 @@ interface AddCardProps {
 }
 
 const AddReward: React.FC<AddCardProps> = ({ onClose, onAddReward }) => {
-  const [headline, setHeadline] = useState('');
-  const [description, setDescription] = useState('');
-  const [points, setPoints] = useState('');
-  const [selectedImage, setSelectedImage] = useState<string>(''); // ✅ selected image from dropdown
+  const [headline, setHeadline] = useState("");
+  const [description, setDescription] = useState("");
+  const [points, setPoints] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string>(""); // ✅ selected image from dropdown
 
   const [errors, setErrors] = useState({
-    headline: '',
-    description: '',
-    points: '',
-    image: '',
+    headline: "",
+    description: "",
+    points: "",
+    image: "",
   });
 
   const handleAdd = () => {
     let hasError = false;
-    const newErrors = { headline: '', description: '', points: '', image: '' };
+    const newErrors = { headline: "", description: "", points: "", image: "" };
 
     if (!headline.trim()) {
-      newErrors.headline = 'Headline is required.';
+      newErrors.headline = "Headline is required.";
       hasError = true;
     }
 
     if (!description.trim()) {
-      newErrors.description = 'Description is required.';
+      newErrors.description = "Description is required.";
       hasError = true;
     }
 
     const numericPoints = parseInt(points, 10);
     if (!points.trim()) {
-      newErrors.points = 'Points are required.';
+      newErrors.points = "Points are required.";
       hasError = true;
     } else if (numericPoints <= 0 || isNaN(numericPoints)) {
-      newErrors.points = 'Points must be a number greater than 0.';
+      newErrors.points = "Points must be a number greater than 0.";
       hasError = true;
     }
 
     if (!selectedImage) {
-      newErrors.image = 'Please select an image.';
+      newErrors.image = "Please select an image.";
       hasError = true;
     }
 
@@ -91,7 +91,9 @@ const AddReward: React.FC<AddCardProps> = ({ onClose, onAddReward }) => {
               onChange={(e) => setHeadline(e.target.value)}
               placeholder="Vanilla Latte (medium)"
             />
-            {errors.headline && <p className="text-red-500 text-sm mt-1">{errors.headline}</p>}
+            {errors.headline && (
+              <p className="text-red-500 text-sm mt-1">{errors.headline}</p>
+            )}
           </div>
 
           <div>
@@ -102,7 +104,9 @@ const AddReward: React.FC<AddCardProps> = ({ onClose, onAddReward }) => {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Applies on order above $50"
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
           </div>
 
           <div>
@@ -113,11 +117,15 @@ const AddReward: React.FC<AddCardProps> = ({ onClose, onAddReward }) => {
               onChange={(e) => setPoints(e.target.value)}
               placeholder="200"
             />
-            {errors.points && <p className="text-red-500 text-sm mt-1">{errors.points}</p>}
+            {errors.points && (
+              <p className="text-red-500 text-sm mt-1">{errors.points}</p>
+            )}
           </div>
 
           <ImageDropDown width="w-100" onSelectImage={setSelectedImage} />
-          {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+          {errors.image && (
+            <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+          )}
 
           <AddButton label="Add Reward" onClick={handleAdd} />
         </div>

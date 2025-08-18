@@ -111,7 +111,8 @@ const Sidebar = () => {
             {sidebarLinks.map(({ icon, link, label, children }) => {
               const isActive =
                 pathname === link ||
-                (children && children.some((child) => pathname.startsWith(child.link)));
+                (children &&
+                  children.some((child) => pathname.startsWith(child.link)));
 
               return (
                 <div key={label}>
@@ -121,7 +122,9 @@ const Sidebar = () => {
                         ? "bg-primary text-white"
                         : "text-gray-600 hover:bg-primary hover:text-white"
                     }`}
-                    onClick={() => (children ? handleToggleSubmenu(label) : router.push(link))}
+                    onClick={() =>
+                      children ? handleToggleSubmenu(label) : router.push(link)
+                    }
                   >
                     <div className="flex items-center gap-2">
                       <span className="group-hover:text-white">{icon}</span>

@@ -1,54 +1,59 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import CardsInput from '@/components/CardsInput';
-import AddButton from '../menu/AddButton';
-import { Calender } from '@/assets/common-icons';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useState } from "react";
+import CardsInput from "@/components/CardsInput";
+import AddButton from "../menu/AddButton";
+import { Calender } from "@/assets/common-icons";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface AddCardProps {
   onClose: () => void;
-  onAddRow: (newData: { Name: string; Email: string; Date: string; status: string; }) => void;
+  onAddRow: (newData: {
+    Name: string;
+    Email: string;
+    Date: string;
+    status: string;
+  }) => void;
 }
 
 const AddEmployee: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
-  const [employeeName, setEmployeeName] = useState('');
-  const [email, setEmail] = useState('');
-  const [joiningDate, setJoiningDate] = useState('');
+  const [employeeName, setEmployeeName] = useState("");
+  const [email, setEmail] = useState("");
+  const [joiningDate, setJoiningDate] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
 
   const [errors, setErrors] = useState({
-    employeeName: '',
-    email: '',
-    joiningDate: '',
+    employeeName: "",
+    email: "",
+    joiningDate: "",
   });
 
   const validate = () => {
     const newErrors: typeof errors = {
-      employeeName: '',
-      email: '',
-      joiningDate: '',
+      employeeName: "",
+      email: "",
+      joiningDate: "",
     };
 
     if (!employeeName.trim()) {
-      newErrors.employeeName = 'Employee name is required.';
+      newErrors.employeeName = "Employee name is required.";
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required.';
+      newErrors.email = "Email is required.";
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      newErrors.email = 'Invalid email format.';
+      newErrors.email = "Invalid email format.";
     }
 
     if (!joiningDate.trim()) {
-      newErrors.joiningDate = 'Joining date is required.';
+      newErrors.joiningDate = "Joining date is required.";
     }
 
     setErrors(newErrors);
 
-    return !Object.values(newErrors).some((msg) => msg !== '');
+    return !Object.values(newErrors).some((msg) => msg !== "");
   };
 
   const handleSubmit = () => {
@@ -57,7 +62,7 @@ const AddEmployee: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
         Name: employeeName,
         Email: email,
         Date: joiningDate,
-        status: 'Active',
+        status: "Active",
       };
       onAddRow(newRow);
       onClose();
@@ -85,7 +90,9 @@ const AddEmployee: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               onChange={(e) => setEmployeeName(e.target.value)}
               placeholder="Ahsan Khan"
             />
-            {errors.employeeName && <p className="text-red-500 text-sm mt-1">{errors.employeeName}</p>}
+            {errors.employeeName && (
+              <p className="text-red-500 text-sm mt-1">{errors.employeeName}</p>
+            )}
           </div>
 
           <div>
@@ -96,7 +103,9 @@ const AddEmployee: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="ahsankhan@gmail.com"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div className="relative">
@@ -107,7 +116,9 @@ const AddEmployee: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               onChange={() => {}}
               placeholder="Set a Date"
             />
-            {errors.joiningDate && <p className="text-red-500 text-sm mt-1">{errors.joiningDate}</p>}
+            {errors.joiningDate && (
+              <p className="text-red-500 text-sm mt-1">{errors.joiningDate}</p>
+            )}
 
             <div
               className="border border-gray-300 w-8 h-8 rounded-full bg-secondary flex items-center justify-center cursor-pointer absolute top-7 right-2"

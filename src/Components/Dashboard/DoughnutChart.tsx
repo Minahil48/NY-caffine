@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
-import { Calender } from '@/assets/common-icons';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useState } from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import { Calender } from "@/assets/common-icons";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -17,21 +17,21 @@ const DoughnutChart: React.FC<OrderChartProps> = ({ orderDataByDate }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const formattedDate = selectedDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const formattedDate = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
   const ordersCount = orderDataByDate[formattedDate] ?? null;
 
   const totalValue = 150;
   const remainingValue = totalValue - (ordersCount ?? 0);
 
   const data = {
-    labels: ['Order', 'Remaining'],
+    labels: ["Order", "Remaining"],
     datasets: [
       {
         data: [ordersCount ?? 0, remainingValue],
-        backgroundColor: ['#874F00', '#EFEFEF'],
+        backgroundColor: ["#874F00", "#EFEFEF"],
         borderWidth: 0,
         borderRadius: [10, 0],
-        cutout: '80%',
+        cutout: "80%",
         hoverOffset: 6,
       },
     ],
@@ -54,9 +54,9 @@ const DoughnutChart: React.FC<OrderChartProps> = ({ orderDataByDate }) => {
   };
 
   const day = selectedDate.getDate();
-  const monthYear = selectedDate.toLocaleDateString('default', {
-    month: 'short',
-    year: 'numeric',
+  const monthYear = selectedDate.toLocaleDateString("default", {
+    month: "short",
+    year: "numeric",
   });
 
   return (
@@ -83,8 +83,6 @@ const DoughnutChart: React.FC<OrderChartProps> = ({ orderDataByDate }) => {
                   setShowCalendar(false);
                 }
               }}
-
-
               inline
             />
           </div>
@@ -97,7 +95,9 @@ const DoughnutChart: React.FC<OrderChartProps> = ({ orderDataByDate }) => {
             <Doughnut data={data} options={options} />
             <div className="absolute w-25 h-25 sm:w-[110px] sm:h-[110px] gap-0.5 bg-secondary whitespace-nowrap rounded-full flex flex-col items-center justify-center text-center">
               <span className="text-lg font-medium text-gray-800">{day}</span>
-              <span className="text-xs text-gray-600 leading-none">{monthYear}</span>
+              <span className="text-xs text-gray-600 leading-none">
+                {monthYear}
+              </span>
             </div>
           </div>
         ) : (

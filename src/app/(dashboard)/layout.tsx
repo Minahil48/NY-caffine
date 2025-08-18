@@ -16,9 +16,7 @@ const DashboardLayout = ({
         <div className="fixed max-w-screen top-0 left-20 lg:left-[224px] right-0 z-0">
           <Header />
         </div>
-        <main className="mt-[75px] p-6 overflow-y-auto flex-1">
-          {children}
-        </main>
+        <main className="mt-[75px] p-6 overflow-y-auto flex-1">{children}</main>
       </div>
     </div>
   );

@@ -1,14 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { edit, Trash } from '@/assets/common-icons';
-import OrderFilters from '@/components/order/Filters';
-import { OrderSearch } from '@/components/order/Search';
-import AddButton from '../menu/AddButton';
-import AddEmployee from './AddEmployee';
-import { getAllEmployees, addEmployee, deleteEmployee } from '@/lib/api/employee/employee';
-import { UpdateUserDetails } from '@/lib/api/auth/settings/settings';
-import DynamicTable from '../order/Table';
+import React, { useState, useEffect } from "react";
+import { edit, Trash } from "@/assets/common-icons";
+import OrderFilters from "@/components/order/Filters";
+import { OrderSearch } from "@/components/order/Search";
+import AddButton from "../menu/AddButton";
+import AddEmployee from "./AddEmployee";
+import {
+  getAllEmployees,
+  addEmployee,
+  deleteEmployee,
+} from "@/lib/api/employee/employee";
+import { UpdateUserDetails } from "@/lib/api/auth/settings/settings";
+import DynamicTable from "../order/Table";
 
 interface Employee {
   _id: string;
@@ -49,9 +53,9 @@ const EmployeeShimmer: React.FC = () => (
 );
 
 const EmployeeSection: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [showAddCard, setShowAddCard] = useState(false);
   const [tableData, setTableData] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,25 +72,25 @@ const EmployeeSection: React.FC = () => {
       const res = await getAllEmployees();
       if (res.success && Array.isArray(res.data)) {
         const employees = res.data
-          .filter((user: any) => user.role === 'employee')
+          .filter((user: any) => user.role === "employee")
           .map((emp: any) => ({
             _id: emp._id,
             Name: emp.name,
             Email: emp.email,
-            Date: new Date(emp.createdAt).toLocaleDateString('en-CA'),
-            status: emp.isActive ? 'Active' : 'Inactive',
+            Date: new Date(emp.createdAt).toLocaleDateString("en-CA"),
+            status: emp.isActive ? "Active" : "Inactive",
           }));
         setTableData(employees);
-      } else setError('Failed to load employees');
+      } else setError("Failed to load employees");
     } catch (err: any) {
-      setError(err.message || 'Failed to load employees');
+      setError(err.message || "Failed to load employees");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (employeeId: string) => {
-    if (!confirm('Are you sure you want to delete this employee?')) return;
+    if (!confirm("Are you sure you want to delete this employee?")) return;
     try {
       const res = await deleteEmployee(employeeId);
       if (!res.success) return;
@@ -96,17 +100,20 @@ const EmployeeSection: React.FC = () => {
     }
   };
 
-
-  const handleAddEmployee = async (formData: { Name: string; Email: string; Date: string }) => {
+  const handleAddEmployee = async (formData: {
+    Name: string;
+    Email: string;
+    Date: string;
+  }) => {
     try {
       const payload = {
         name: formData.Name,
         email: formData.Email,
-        phone: '03438390230',
+        phone: "03438390230",
         isActive: true,
-        password: '123456',
-        role: 'employee' as const,
-        extra: { branchId: '689a6e88210ce445b1ecf48a' },
+        password: "123456",
+        role: "employee" as const,
+        extra: { branchId: "689a6e88210ce445b1ecf48a" },
       };
       const res = await addEmployee(payload);
       if (res.success && res.data) {
@@ -117,7 +124,7 @@ const EmployeeSection: React.FC = () => {
             Name: payload.name,
             Email: payload.email,
             Date: formData.Date,
-            status: payload.isActive ? 'Active' : 'Inactive',
+            status: payload.isActive ? "Active" : "Inactive",
           },
         ]);
         setShowAddCard(false);
@@ -126,7 +133,6 @@ const EmployeeSection: React.FC = () => {
       console.error(err);
     }
   };
-
 
   const handleEdit = async (updatedRow: Record<string, any>) => {
     try {
@@ -138,13 +144,18 @@ const EmployeeSection: React.FC = () => {
       setTableData((prev) =>
         prev.map((emp) =>
           emp._id === updatedRow.ID
-            ? { ...emp, Name: updatedRow.Name, Email: updatedRow.Email, Date: updatedRow.Date }
+            ? {
+                ...emp,
+                Name: updatedRow.Name,
+                Email: updatedRow.Email,
+                Date: updatedRow.Date,
+              }
             : emp
         )
       );
       return true;
     } catch (err) {
-      console.error('Error updating employee:', err);
+      console.error("Error updating employee:", err);
       return false;
     }
   };
@@ -164,10 +175,9 @@ const EmployeeSection: React.FC = () => {
     status: emp.status,
   }));
 
-
   const actionIcons = [
-    { icon: Trash, action: 'delete' },
-    { icon: edit, action: 'edit' },
+    { icon: Trash, action: "delete" },
+    { icon: edit, action: "edit" },
   ];
 
   if (loading) return <EmployeeShimmer />;
@@ -177,7 +187,10 @@ const EmployeeSection: React.FC = () => {
     <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
       <div className="flex w-full justify-between">
         <h1 className="text-xl font-medium">All Employees</h1>
-        <AddButton label="+ Add Employee" onClick={() => setShowAddCard(true)} />
+        <AddButton
+          label="+ Add Employee"
+          onClick={() => setShowAddCard(true)}
+        />
       </div>
 
       <div className="flex flex-row justify-between w-full">
@@ -200,7 +213,10 @@ const EmployeeSection: React.FC = () => {
       />
 
       {showAddCard && (
-        <AddEmployee onClose={() => setShowAddCard(false)} onAddRow={handleAddEmployee} />
+        <AddEmployee
+          onClose={() => setShowAddCard(false)}
+          onAddRow={handleAddEmployee}
+        />
       )}
     </div>
   );

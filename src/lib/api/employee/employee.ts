@@ -1,7 +1,7 @@
 "use server";
 
 import axiosInstance from "@/axiosInstance";
-import { cookies } from "next/headers";
+import getAuthHeaders from "@/authHeader";
 
 interface EmployeeData {
   name: string;
@@ -16,44 +16,20 @@ interface EmployeeData {
 }
 
 export const getAllEmployees = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const res = await axiosInstance.get("/users", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.get("/users", { headers });
   return res.data;
 };
+
 
 export const addEmployee = async (employeeData: EmployeeData) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const res = await axiosInstance.post(
-    "/users",
-    employeeData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.post("/users", employeeData, { headers });
   return res.data;
 };
 
-export const deleteEmployee= async (UserId: string) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const res = await axiosInstance.delete(`/users/${UserId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+export const deleteEmployee = async (userId: string) => {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.delete(`/users/${userId}`, { headers });
   return res.data;
 };

@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 interface GeneralCardProps {
   date: string;
-  id: string;          
+  id: string;
   name: string;
   contact: string;
   branch: string;
