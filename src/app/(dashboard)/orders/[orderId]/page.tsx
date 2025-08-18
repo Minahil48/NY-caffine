@@ -27,13 +27,11 @@ export default async function OrderDetailsPage({ params }: PageProps) {
     return sum + (product.itemPrice || 0) * (product.itemQuantity || 1);
   }, 0);
 
-
   const gst = parseFloat((total * 0.05).toFixed(2));
   const subtotal = parseFloat((total + gst).toFixed(2));
 
   return (
     <div className="flex flex-col bg-white rounded-2xl min-h-screen mb-2">
-
       <div className="flex w-full justify-between p-5">
         <Link href={"/orders"}>
           <div className="flex items-center p-3 hover:text-primary cursor-pointer">
@@ -50,7 +48,6 @@ export default async function OrderDetailsPage({ params }: PageProps) {
           name={order.customerName || order.user?.name || "Unknown"}
           contact={order.customerPhone || order.user?.phone || "N/A"}
           branch={order.products?.[0]?.item?.branch?.[0] || "N/A"}
-
         />
 
         <PaymentDetailsCard
@@ -76,7 +73,9 @@ export default async function OrderDetailsPage({ params }: PageProps) {
         <div className="flex flex-col gap-4">
           {order.products.map((item: any, index: number) => {
             const modifiersList =
-              item.modifiers?.map((mod: any) => mod.modifier || "No modifier") || [];
+              item.modifiers?.map(
+                (mod: any) => mod.modifier || "No modifier"
+              ) || [];
 
             return (
               <Items

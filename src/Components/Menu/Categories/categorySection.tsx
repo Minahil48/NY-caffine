@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { edit, Trash } from '@/assets/common-icons';
-import OrderFilters from '@/components/order/Filters';
-import { OrderSearch } from '@/components/order/Search';
-import DynamicTable from '@/components/order/Table';
-import AddCard from './AddCard';
-import AddButton from '../AddButton';
-import { addCategory, getAllCategory, deleteCategory, updateCategory } from '@/lib/api/menu/category';
+import React, { useState, useEffect } from "react";
+import { edit, Trash } from "@/assets/common-icons";
+import OrderFilters from "@/components/order/Filters";
+import { OrderSearch } from "@/components/order/Search";
+import DynamicTable from "@/components/order/Table";
+import AddCard from "./AddCard";
+import AddButton from "../AddButton";
+import {
+  addCategory,
+  getAllCategory,
+  deleteCategory,
+  updateCategory,
+} from "@/lib/api/menu/category";
 
 interface Category {
   _id: string;
@@ -42,8 +47,8 @@ const CategoryShimmer: React.FC = () => (
 );
 
 const CategorySection: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedProduct, setSelectedProduct] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [showAddCard, setShowAddCard] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -59,19 +64,21 @@ const CategorySection: React.FC = () => {
     try {
       const res = await getAllCategory();
       if (res.success && Array.isArray(res.categories)) {
-        setCategories(res.categories.map((cat: any) => ({ _id: cat._id, name: cat.name })));
+        setCategories(
+          res.categories.map((cat: any) => ({ _id: cat._id, name: cat.name }))
+        );
       } else {
-        setError('Failed to load categories');
+        setError("Failed to load categories");
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load categories');
+      setError(err.message || "Failed to load categories");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (categoryId: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
+    if (!confirm("Are you sure you want to delete this category?")) return;
     try {
       const res = await deleteCategory(categoryId);
       if (!res.success) return;
@@ -83,9 +90,12 @@ const CategorySection: React.FC = () => {
 
   const addRowToTable = async (newCategory: { Name: string }) => {
     try {
-      const res = await addCategory({ id: '', name: newCategory.Name });
+      const res = await addCategory({ id: "", name: newCategory.Name });
       if (res.success && res.data) {
-        setCategories((prev) => [...prev, { _id: res.data._id, name: res.data.name }]);
+        setCategories((prev) => [
+          ...prev,
+          { _id: res.data._id, name: res.data.name },
+        ]);
         setShowAddCard(false);
       }
     } catch (err) {
@@ -93,10 +103,12 @@ const CategorySection: React.FC = () => {
     }
   };
 
- 
   const handleEdit = async (updatedRow: Record<string, any>) => {
     try {
-      const res = await updateCategory({ id: updatedRow.ID, name: updatedRow.Name });
+      const res = await updateCategory({
+        id: updatedRow.ID,
+        name: updatedRow.Name,
+      });
       if (!res.success) return false;
 
       setCategories((prev) =>
@@ -106,7 +118,7 @@ const CategorySection: React.FC = () => {
       );
       return true;
     } catch (err) {
-      console.error('Error updating category:', err);
+      console.error("Error updating category:", err);
       return false;
     }
   };
@@ -117,11 +129,13 @@ const CategorySection: React.FC = () => {
       (selectedProduct ? cat.name === selectedProduct : true)
   );
 
-  const productOptions: string[] = Array.from(new Set(categories.map((cat) => cat.name)));
+  const productOptions: string[] = Array.from(
+    new Set(categories.map((cat) => cat.name))
+  );
 
   const actionIcons = [
-    { icon: Trash, action: 'delete' },
-    { icon: edit, action: 'edit' },
+    { icon: Trash, action: "delete" },
+    { icon: edit, action: "edit" },
   ];
 
   const mappedData = filteredCategories.map((cat) => ({
@@ -136,7 +150,10 @@ const CategorySection: React.FC = () => {
     <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
       <div className="flex w-full justify-between">
         <h1 className="text-xl font-medium">All Categories</h1>
-        <AddButton label="+ Add New Category" onClick={() => setShowAddCard(true)} />
+        <AddButton
+          label="+ Add New Category"
+          onClick={() => setShowAddCard(true)}
+        />
       </div>
 
       <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
@@ -160,7 +177,12 @@ const CategorySection: React.FC = () => {
         onEdit={handleEdit}
       />
 
-      {showAddCard && <AddCard onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
+      {showAddCard && (
+        <AddCard
+          onClose={() => setShowAddCard(false)}
+          onAddRow={addRowToTable}
+        />
+      )}
     </div>
   );
 };

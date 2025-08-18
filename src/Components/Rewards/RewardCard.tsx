@@ -1,5 +1,5 @@
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 interface ProductCardProps {
   imageSrc: string;
   title: string;
@@ -7,7 +7,12 @@ interface ProductCardProps {
   points: string;
 }
 
-const RewardCard: React.FC<ProductCardProps> = ({ imageSrc, title, subtitle, points }) => {
+const RewardCard: React.FC<ProductCardProps> = ({
+  imageSrc,
+  title,
+  subtitle,
+  points,
+}) => {
   return (
     <div className="bg-white border-1 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 max-w-[300px]">
       <Image
@@ -18,12 +23,8 @@ const RewardCard: React.FC<ProductCardProps> = ({ imageSrc, title, subtitle, poi
         className=" object-cover rounded-t-xl p-2"
       />
       <div className="p-4 flex flex-col">
-        <h3 className="text-md text-gray-800 mb-3">
-          {title}
-        </h3>
-        <p className="text-sm text-gray-500 min-h-10 mb-3">
-          {subtitle}
-        </p>
+        <h3 className="text-md text-gray-800 mb-3">{title}</h3>
+        <p className="text-sm text-gray-500 min-h-10 mb-3">{subtitle}</p>
         <ul className="text-sm text-gray-800">
           <li>
             <span className="text-gray-500 mr-2">•</span>

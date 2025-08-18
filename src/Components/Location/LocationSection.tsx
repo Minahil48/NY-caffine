@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import OrderFilters from "../order/Filters";
@@ -30,7 +30,6 @@ const LocationSection: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     async function fetchLocations() {
       setLoading(true);
@@ -50,7 +49,6 @@ const LocationSection: React.FC = () => {
     }
     fetchLocations();
   }, []);
-
 
   const addRowToTable = async (newData: {
     branchCode?: string;
@@ -92,7 +90,6 @@ const LocationSection: React.FC = () => {
     }
   };
 
-
   const handleDelete = async (locationId: string) => {
     if (!confirm("Are you sure you want to delete this branch?")) return;
 
@@ -107,7 +104,6 @@ const LocationSection: React.FC = () => {
       console.error("Error deleting branch:", error);
     }
   };
-
 
   const handleEdit = async (updatedRow: Record<string, any>) => {
     try {
@@ -175,9 +171,11 @@ const LocationSection: React.FC = () => {
       <div className="mt-6 overflow-x-auto">
         <div className="min-w-full bg-gray-50 rounded-lg shadow p-4">
           <div className="flex gap-4 border-gray-200 pb-2 mb-3">
-            {["Branch Code", "Branch Name", "Address", "Actions"].map((_, idx) => (
-              <div key={idx} className="h-5 bg-gray-300 rounded w-70"></div>
-            ))}
+            {["Branch Code", "Branch Name", "Address", "Actions"].map(
+              (_, idx) => (
+                <div key={idx} className="h-5 bg-gray-300 rounded w-70"></div>
+              )
+            )}
           </div>
 
           {Array.from({ length: 5 }).map((_, rowIdx) => (
@@ -200,7 +198,10 @@ const LocationSection: React.FC = () => {
     <div className="flex flex-col gap-5 m-2 bg-white p-7 rounded-2xl">
       <div className="flex w-full justify-between">
         <h1 className="text-xl font-medium">Branches</h1>
-        <AddButton label="+ Add New Branch" onClick={() => setShowAddCard(true)} />
+        <AddButton
+          label="+ Add New Branch"
+          onClick={() => setShowAddCard(true)}
+        />
       </div>
 
       <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
@@ -218,9 +219,19 @@ const LocationSection: React.FC = () => {
         </div>
       </div>
 
-      <OrderTable data={mappedData} icons={actionIcons} onDelete={handleDelete} onEdit={handleEdit} />
+      <OrderTable
+        data={mappedData}
+        icons={actionIcons}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+      />
 
-      {showAddCard && <AddBranch onClose={() => setShowAddCard(false)} onAddRow={addRowToTable} />}
+      {showAddCard && (
+        <AddBranch
+          onClose={() => setShowAddCard(false)}
+          onAddRow={addRowToTable}
+        />
+      )}
     </div>
   );
 };

@@ -7,7 +7,12 @@ type ButtonProps = {
   className?: string;
 };
 
-const Button: React.FC<ButtonProps> = ({ value, type = "button", onClick, className = "" }) => {
+const Button: React.FC<ButtonProps> = ({
+  value,
+  type = "button",
+  onClick,
+  className = "",
+}) => {
   return (
     <button
       type={type}

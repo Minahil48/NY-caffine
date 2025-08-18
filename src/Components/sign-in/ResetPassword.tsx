@@ -36,7 +36,9 @@ function ResetPassword() {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) {
-      toast.error("Please make sure passwords match and are at least 6 characters.");
+      toast.error(
+        "Please make sure passwords match and are at least 6 characters."
+      );
       return;
     }
     try {
@@ -94,13 +96,13 @@ function ResetPassword() {
                 />
               </div>
               <div className="flex justify-center mt-8">
-              <Button
-                type="submit"
-                value="Reset password"
-                className={`w-full ${
-                  !isValid ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              />
+                <Button
+                  type="submit"
+                  value="Reset password"
+                  className={`w-full ${
+                    !isValid ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                />
               </div>
             </form>
           </div>

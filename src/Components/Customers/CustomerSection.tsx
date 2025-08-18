@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { edit, Trash, Eye } from '@/assets/common-icons';
-import { OrderSearch } from '@/components/order/Search';
-import DynamicTable from '@/components/order/Table';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { getAllCustomers, deleteCustomer } from '@/lib/api/customer/customer';
-import { UpdateUserDetails } from '@/lib/api/auth/settings/settings';
+import React, { useState, useEffect } from "react";
+import { edit, Trash, Eye } from "@/assets/common-icons";
+import { OrderSearch } from "@/components/order/Search";
+import DynamicTable from "@/components/order/Table";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { getAllCustomers, deleteCustomer } from "@/lib/api/customer/customer";
+import { UpdateUserDetails } from "@/lib/api/auth/settings/settings";
 
 interface Customer {
   _id: string;
@@ -16,52 +16,33 @@ interface Customer {
   Date?: string;
 }
 
-const CustomerShimmer: React.FC = () => {
-  return (
-    <div className="animate-pulse flex flex-col gap-4 mt-4">
-
-      <div className="flex items-center justify-between w-full pb-3">
-        <div className="h-5 w-1/4 bg-gray-300 rounded"></div>
-        <div className="h-8 w-1/3 bg-gray-200 rounded"></div>
+const CustomerShimmer: React.FC = () => (
+  <div className="animate-pulse flex flex-col gap-4 mt-4">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex items-center justify-between pb-3">
+        <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
+        <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
+        <div className="h-4 w-1/5 bg-gray-200 rounded"></div>
+        <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
       </div>
+    ))}
+  </div>
+);
 
-      <div className="flex gap-4 w-full">
-        <div className="h-8 w-28 bg-gray-200 rounded"></div>
-        <div className="h-8 w-40 bg-gray-200 rounded"></div>
-      </div>
-
-
-      <div className="flex items-center justify-between pb-3 mt-3">
-        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
-        <div className="h-4 w-1/4 bg-gray-300 rounded"></div>
-        <div className="h-4 w-1/5 bg-gray-300 rounded"></div>
-        <div className="h-4 w-1/6 bg-gray-300 rounded"></div>
-      </div>
-
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center justify-between pb-3"
-        >
-          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
-          <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
-          <div className="h-4 w-1/5 bg-gray-200 rounded"></div>
-          <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
-        </div>
-      ))}
-    </div>
-  );
+const formatDate = (date: Date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 const CustomerSection: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [tableData, setTableData] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const formatDate = (date: Date) => date.toISOString().split('T')[0];
-
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -70,19 +51,19 @@ const CustomerSection: React.FC = () => {
       const res = await getAllCustomers();
       if (res.success && Array.isArray(res.data)) {
         const customers = res.data
-          .filter((user: any) => user.role === 'customer')
+          .filter((user: any) => user.role === "customer")
           .map((cus: any) => ({
             _id: cus._id,
             Name: cus.name,
             Email: cus.email,
-            Date: cus.createdAt ? new Date(cus.createdAt).toISOString().split('T')[0] : '',
+            Date: cus.createdAt ? formatDate(new Date(cus.createdAt)) : "",
           }));
         setTableData(customers);
       } else {
-        setError('Failed to load customers');
+        setError("Failed to load customers");
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load customers');
+      setError(err.message || "Failed to load customers");
     } finally {
       setLoading(false);
     }
@@ -92,9 +73,8 @@ const CustomerSection: React.FC = () => {
     fetchCustomers();
   }, []);
 
-
   const handleDelete = async (customerId: string) => {
-    if (!confirm('Are you sure you want to delete this customer?')) return;
+    if (!confirm("Are you sure you want to delete this customer?")) return;
     try {
       const res = await deleteCustomer(customerId);
       if (!res.success) return;
@@ -103,7 +83,6 @@ const CustomerSection: React.FC = () => {
       console.error(err);
     }
   };
-
 
   const handleEdit = async (updatedRow: Record<string, any>) => {
     try {
@@ -120,7 +99,7 @@ const CustomerSection: React.FC = () => {
       );
       return true;
     } catch (err) {
-      console.error('Error updating customer:', err);
+      console.error("Error updating customer:", err);
       return false;
     }
   };
@@ -131,7 +110,9 @@ const CustomerSection: React.FC = () => {
 
   if (selectedDate) {
     const formatted = formatDate(selectedDate);
-    filteredCustomers = filteredCustomers.filter((customer) => customer.Date === formatted);
+    filteredCustomers = filteredCustomers.filter(
+      (customer) => customer.Date === formatted
+    );
   }
 
   const mappedData = filteredCustomers.map((cus) => ({
@@ -142,9 +123,9 @@ const CustomerSection: React.FC = () => {
   }));
 
   const actionIcons = [
-    { icon: Trash, action: 'delete' },
-    { icon: edit, action: 'edit' },
-    { icon: Eye, action: 'view' },
+    { icon: Trash, action: "delete" },
+    { icon: edit, action: "edit" },
+    { icon: Eye, action: "view" },
   ];
 
   return (
@@ -160,15 +141,26 @@ const CustomerSection: React.FC = () => {
             <OrderSearch value={searchTerm} onChange={setSearchTerm} />
           </div>
 
-          <div className="flex flex-row justify-between w-full gap-4 pb-4">
+          <div className="flex flex-row justify-between w-full gap-4 pb-4 items-center">
             <DatePicker
               selected={selectedDate}
               onChange={(date: Date | null) => setSelectedDate(date)}
               dateFormat="yyyy-MM-dd"
               placeholderText="Date"
-              className="border border-gray-300 text-gray-700 text-medium max-w-[100px] p-2 rounded-md text-sm"
+              className="border border-gray-300 text-gray-700 text-medium max-w-[120px] p-2 rounded-md text-sm"
               maxDate={new Date()}
+              isClearable
             />
+
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedDate(null);
+              }}
+              className="text-sm text-red-500 hover:underline"
+            >
+              Clear Filters
+            </button>
           </div>
 
           <DynamicTable

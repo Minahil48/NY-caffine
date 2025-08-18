@@ -1,39 +1,23 @@
-'use server';
+"use server";
 
 import axiosInstance from "@/axiosInstance";
-import { cookies } from "next/headers";
+import getAuthHeaders from "@/authHeader";
 
-export const getAllRewards = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const res = await axiosInstance.get("/reward", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return res.data;
-};
-
-export const addReward = async (rewardData: {
+interface RewardData {
   headline: string;
   description: string;
   allocatePoints: number;
   image: string;
-}) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+}
 
-  const res = await axiosInstance.post(
-    "/reward",
-    rewardData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export const getAllRewards = async () => {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.get("/reward", { headers });
+  return res.data;
+};
 
+export const addReward = async (rewardData: RewardData) => {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.post("/reward", rewardData, { headers });
   return res.data;
 };

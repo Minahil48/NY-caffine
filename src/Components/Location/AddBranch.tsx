@@ -1,47 +1,51 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import CardsInput from '@/components/CardsInput';
-import AddButton from '../menu/AddButton';
+import React, { useState } from "react";
+import CardsInput from "@/components/CardsInput";
+import AddButton from "../menu/AddButton";
 
 interface AddCardProps {
   onClose: () => void;
-  onAddRow: (newData: { branchCode: string; name: string; address: string }) => void;
+  onAddRow: (newData: {
+    branchCode: string;
+    name: string;
+    address: string;
+  }) => void;
 }
 
 const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
-  const [branchName, setBranchName] = useState('');
-  const [branchCode, setBranchCode] = useState('');
-  const [address, setAddress] = useState('');
+  const [branchName, setBranchName] = useState("");
+  const [branchCode, setBranchCode] = useState("");
+  const [address, setAddress] = useState("");
 
   const [errors, setErrors] = useState({
-    branchName: '',
-    branchCode: '',
-    address: '',
+    branchName: "",
+    branchCode: "",
+    address: "",
   });
 
   const validate = () => {
     const newErrors: typeof errors = {
-      branchName: '',
-      branchCode: '',
-      address: '',
+      branchName: "",
+      branchCode: "",
+      address: "",
     };
 
     if (!branchName.trim()) {
-      newErrors.branchName = 'Branch name is required.';
+      newErrors.branchName = "Branch name is required.";
     }
 
     if (!branchCode.trim()) {
-      newErrors.branchCode = 'Branch code is required.';
+      newErrors.branchCode = "Branch code is required.";
     }
 
     if (!address.trim()) {
-      newErrors.address = 'Address is required.';
+      newErrors.address = "Address is required.";
     }
 
     setErrors(newErrors);
 
-    return !Object.values(newErrors).some((msg) => msg !== '');
+    return !Object.values(newErrors).some((msg) => msg !== "");
   };
 
   const handleSubmit = () => {
@@ -75,10 +79,14 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               label="Branch Name"
               required
               value={branchName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBranchName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setBranchName(e.target.value)
+              }
               placeholder="London Branch"
             />
-            {errors.branchName && <p className="text-red-500 text-sm mt-1">{errors.branchName}</p>}
+            {errors.branchName && (
+              <p className="text-red-500 text-sm mt-1">{errors.branchName}</p>
+            )}
           </div>
 
           <div>
@@ -86,10 +94,14 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               label="Branch Code"
               required
               value={branchCode}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBranchCode(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setBranchCode(e.target.value)
+              }
               placeholder="NY-123"
             />
-            {errors.branchCode && <p className="text-red-500 text-sm mt-1">{errors.branchCode}</p>}
+            {errors.branchCode && (
+              <p className="text-red-500 text-sm mt-1">{errors.branchCode}</p>
+            )}
           </div>
 
           <div>
@@ -97,10 +109,14 @@ const AddBranch: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
               label="Branch Address"
               required
               value={address}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setAddress(e.target.value)
+              }
               placeholder="Enter address"
             />
-            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+            {errors.address && (
+              <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+            )}
           </div>
 
           <AddButton label="Add Branch" onClick={handleSubmit} />

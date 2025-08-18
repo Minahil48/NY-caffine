@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { iconDown } from '@/assets/common-icons';
+import React, { useState, useRef, useEffect } from "react";
+import { iconDown } from "@/assets/common-icons";
 
 interface DateFilterDropdownProps {
   label: string;
@@ -21,12 +21,15 @@ const OrderFilters: React.FC<DateFilterDropdownProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -41,7 +44,9 @@ const OrderFilters: React.FC<DateFilterDropdownProps> = ({
 
       <div
         className={`absolute z-10 left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow transition-all duration-200 ease-in-out ${
-          isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+          isOpen
+            ? "opacity-100 scale-100"
+            : "opacity-0 scale-95 pointer-events-none"
         }`}
       >
         <div className="max-h-40 overflow-y-auto">
@@ -49,7 +54,9 @@ const OrderFilters: React.FC<DateFilterDropdownProps> = ({
             <div
               key={`${option}-${index}`}
               className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 ${
-                selected === option ? 'bg-gray-100 font-medium text-gray-800' : 'text-gray-700'
+                selected === option
+                  ? "bg-gray-100 font-medium text-gray-800"
+                  : "text-gray-700"
               }`}
               onClick={() => {
                 onSelect?.(option);

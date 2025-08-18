@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
-const tabs = ['All Orders', 'Pending', 'Canceled', 'Completed'];
+const tabs = ["All Orders", "Pending", "Canceled", "Completed"];
 
 interface OrderTabsProps {
   activeTab: string;
@@ -21,8 +21,8 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
           onClick={() => setActiveTab(tab)}
           className={`border-b-2 pb-1 ${
             activeTab === tab
-              ? 'text-primary border-primary cursor-pointer'
-              : 'border-transparent hover:text-primary cursor-pointer'
+              ? "text-primary border-primary cursor-pointer"
+              : "border-transparent hover:text-primary cursor-pointer"
           }`}
         >
           {tab}

@@ -3,9 +3,13 @@
 import { CloseEyeIcon, edit, EyeIcon } from "@/assets/common-icons";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { GetCurrentUser, UpdateUserDetails, ChangePassword } from "@/lib/api/auth/settings/settings";
+import {
+  GetCurrentUser,
+  UpdateUserDetails,
+  ChangePassword,
+} from "@/lib/api/auth/settings/settings";
 
-const Page = () => {
+const SettingsPage = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [editProfile, setEditProfile] = useState(false);
   const [formData, setFormData] = useState<any>({
@@ -16,9 +20,18 @@ const Page = () => {
     role: "",
     password: "",
     isActive: true,
-    extra: { rewardPoints: 0, currentRedeemedReward: null, rewardHistory: [], image: null },
+    extra: {
+      rewardPoints: 0,
+      currentRedeemedReward: null,
+      rewardHistory: [],
+      image: null,
+    },
   });
-  const [tempFormData, setTempFormData] = useState({ name: "", email: "", phone: "" });
+  const [tempFormData, setTempFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
   const [passwords, setPasswords] = useState({ old: "", new: "", confirm: "" });
   const [passwordError, setPasswordError] = useState("");
   const [profileMessage, setProfileMessage] = useState("");
@@ -33,7 +46,11 @@ const Page = () => {
         if (res.success && res.user) {
           const user = res.user;
           setFormData(user);
-          setTempFormData({ name: user.name, email: user.email, phone: user.phone });
+          setTempFormData({
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+          });
           setSelectedImage(user.extra?.image || null);
         }
       } catch (err) {
@@ -46,8 +63,10 @@ const Page = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return alert("No file selected.");
-    if (!file.type.startsWith("image/")) return alert("Please upload a valid image file.");
-    if (file.size >= 1024 * 1024) return alert("Image must be smaller than 1MB.");
+    if (!file.type.startsWith("image/"))
+      return alert("Please upload a valid image file.");
+    if (file.size >= 1024 * 1024)
+      return alert("Image must be smaller than 1MB.");
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -68,7 +87,11 @@ const Page = () => {
       const res = await UpdateUserDetails(formData._id, updatedData);
       if (res.success) {
         setFormData(res.data);
-        setTempFormData({ name: res.data.name, email: res.data.email, phone: res.data.phone });
+        setTempFormData({
+          name: res.data.name,
+          email: res.data.email,
+          phone: res.data.phone,
+        });
         setProfileMessage(res.message);
         setEditProfile(false);
         setTimeout(() => setProfileMessage(""), 3000);
@@ -79,24 +102,30 @@ const Page = () => {
   };
 
   const handleSavePassword = async () => {
-  if (passwords.new.length < 6) return setPasswordError("Password must be at least 6 characters.");
-  if (passwords.new !== passwords.confirm) return setPasswordError("Passwords do not match.");
-  setPasswordError("");
+    if (passwords.new.length < 6)
+      return setPasswordError("Password must be at least 6 characters.");
+    if (passwords.new !== passwords.confirm)
+      return setPasswordError("Passwords do not match.");
+    setPasswordError("");
 
-  try {
-    const res = await ChangePassword(passwords.old, passwords.new);
-    alert(res.message);
-    setPasswords({ old: "", new: "", confirm: "" });
-    setIsChangingPassword(false);
-  } catch (err: any) {
-    console.error(err);
-    setPasswordError(err.message || "Failed to change password.");
-  }
-};
-
+    try {
+      const res = await ChangePassword(passwords.old, passwords.new);
+      alert(res.message);
+      setPasswords({ old: "", new: "", confirm: "" });
+      setIsChangingPassword(false);
+    } catch (err: any) {
+      console.error(err);
+      setPasswordError(err.message || "Failed to change password.");
+    }
+  };
 
   const handleDisable = async () => {
-    if (!confirm("Are you sure you want to disable your account? This action cannot be undone.")) return;
+    if (
+      !confirm(
+        "Are you sure you want to disable your account? This action cannot be undone."
+      )
+    )
+      return;
     alert("Account disabled successfully!"); // Replace with actual API call
   };
 
@@ -106,8 +135,12 @@ const Page = () => {
       <div className="w-1/4 bg-white rounded-lg p-6 h-fit">
         <div className="flex flex-col items-center">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-800">{formData.name || "Loading..."}</h2>
-            <p className="text-sm text-gray-500">{formData.email || "Loading..."}</p>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {formData.name || "Loading..."}
+            </h2>
+            <p className="text-sm text-gray-500">
+              {formData.email || "Loading..."}
+            </p>
           </div>
           <div className="my-6 relative">
             <Image
@@ -120,14 +153,22 @@ const Page = () => {
           </div>
           <label className="bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg text-sm mb-4 hover:bg-gray-50 transition-colors cursor-pointer">
             Upload New Photo
-            <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
           </label>
           <div className="bg-blue-50 text-blue-800 border border-blue-200 rounded-lg p-3 text-sm text-center">
             <p>Upload avatar. Larger image will be resized automatically</p>
             <p className="mt-1">Maximum size is 1MB</p>
           </div>
           <p className="text-sm text-gray-500 mt-6">
-            Joined on {formData.createdAt ? new Date(formData.createdAt).toLocaleDateString() : "Loading..."}
+            Joined on{" "}
+            {formData.createdAt
+              ? new Date(formData.createdAt).toLocaleDateString()
+              : "Loading..."}
           </p>
         </div>
       </div>
@@ -136,7 +177,9 @@ const Page = () => {
       <div className="w-3/4 ml-8 bg-white rounded-lg p-8">
         {/* Profile Info */}
         <div className="flex justify-between items-center pb-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-800">Profile Information</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Profile Information
+          </h1>
           {!editProfile && (
             <button
               onClick={() => setEditProfile(true)}
@@ -149,38 +192,56 @@ const Page = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">First Name</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              First Name
+            </label>
             <input
               type="text"
               value={tempFormData.name}
-              onChange={(e) => setTempFormData({ ...tempFormData, name: e.target.value })}
+              onChange={(e) =>
+                setTempFormData({ ...tempFormData, name: e.target.value })
+              }
               readOnly={!editProfile}
               className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${
-                editProfile ? "bg-white" : "bg-gray-50 cursor-not-allowed text-gray-600"
+                editProfile
+                  ? "bg-white"
+                  : "bg-gray-50 cursor-not-allowed text-gray-600"
               }`}
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">Email</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              Email
+            </label>
             <input
               type="email"
               value={tempFormData.email}
-              onChange={(e) => setTempFormData({ ...tempFormData, email: e.target.value })}
+              onChange={(e) =>
+                setTempFormData({ ...tempFormData, email: e.target.value })
+              }
               readOnly={!editProfile}
               className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${
-                editProfile ? "bg-white" : "bg-gray-50 cursor-not-allowed text-gray-600"
+                editProfile
+                  ? "bg-white"
+                  : "bg-gray-50 cursor-not-allowed text-gray-600"
               }`}
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              Phone Number
+            </label>
             <input
               type="text"
               value={tempFormData.phone}
-              onChange={(e) => setTempFormData({ ...tempFormData, phone: e.target.value })}
+              onChange={(e) =>
+                setTempFormData({ ...tempFormData, phone: e.target.value })
+              }
               readOnly={!editProfile}
               className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${
-                editProfile ? "bg-white" : "bg-gray-50 cursor-not-allowed text-gray-600"
+                editProfile
+                  ? "bg-white"
+                  : "bg-gray-50 cursor-not-allowed text-gray-600"
               }`}
             />
           </div>
@@ -190,19 +251,28 @@ const Page = () => {
           <div className="flex space-x-2 pt-4">
             <button
               onClick={() => {
-                setTempFormData({ name: formData.name, email: formData.email, phone: formData.phone });
+                setTempFormData({
+                  name: formData.name,
+                  email: formData.email,
+                  phone: formData.phone,
+                });
                 setEditProfile(false);
               }}
               className="bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-50"
             >
               Cancel
             </button>
-            <button onClick={handleSaveProfile} className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+            <button
+              onClick={handleSaveProfile}
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+            >
               Save
             </button>
           </div>
         )}
-        {profileMessage && <p className="text-green-600 mt-2 text-sm">{profileMessage}</p>}
+        {profileMessage && (
+          <p className="text-green-600 mt-2 text-sm">{profileMessage}</p>
+        )}
 
         {/* Password Section */}
         <div className="mt-8">
@@ -210,9 +280,12 @@ const Page = () => {
           <div className="mt-6">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-lg font-medium text-gray-800">Change Password</h3>
+                <h3 className="text-lg font-medium text-gray-800">
+                  Change Password
+                </h3>
                 <p className="text-sm text-gray-500">
-                  You will be logged out of all active sessions. Re-login required.
+                  You will be logged out of all active sessions. Re-login
+                  required.
                 </p>
               </div>
               {!isChangingPassword && (
@@ -231,21 +304,27 @@ const Page = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Old Password"
                   value={passwords.old}
-                  onChange={(e) => setPasswords({ ...passwords, old: e.target.value })}
+                  onChange={(e) =>
+                    setPasswords({ ...passwords, old: e.target.value })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="New Password"
                   value={passwords.new}
-                  onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                  onChange={(e) =>
+                    setPasswords({ ...passwords, new: e.target.value })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm Password"
                   value={passwords.confirm}
-                  onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                  onChange={(e) =>
+                    setPasswords({ ...passwords, confirm: e.target.value })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
                 <button
@@ -255,7 +334,9 @@ const Page = () => {
                 >
                   {showPassword ? EyeIcon : CloseEyeIcon}
                 </button>
-                {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+                {passwordError && (
+                  <p className="text-red-500 text-sm">{passwordError}</p>
+                )}
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setIsChangingPassword(false)}
@@ -279,8 +360,12 @@ const Page = () => {
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-medium text-red-600">Disable Account</h3>
-              <p className="text-sm text-gray-500">All the data will be lost. Non-revertible action</p>
+              <h3 className="text-lg font-medium text-red-600">
+                Disable Account
+              </h3>
+              <p className="text-sm text-gray-500">
+                All the data will be lost. Non-revertible action
+              </p>
             </div>
             <button
               onClick={handleDisable}
@@ -295,4 +380,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default SettingsPage;

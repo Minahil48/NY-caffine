@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trash, Eye, Change } from "@/assets/common-icons";
+import { Trash, Eye } from "@/assets/common-icons";
 import { OrderTabs } from "./OrderTabs";
 import OrderFilters from "./Filters";
 import { OrderSearch } from "./Search";
@@ -19,6 +19,11 @@ interface Order {
   Status: string;
 }
 
+interface OrderSectionProps {
+  ordersList: Order[];
+}
+
+// Shimmer components
 const TableShimmer = () => (
   <div className="w-full border border-gray-200 rounded-lg overflow-hidden animate-pulse">
     <div className="grid grid-cols-6 gap-2 bg-gray-100 p-3">
@@ -41,7 +46,6 @@ const TableShimmer = () => (
 
 const PageShimmer = () => (
   <div className="flex flex-col gap-5 m-2 bg-white p-6 rounded-2xl animate-pulse">
-
     <div className="flex gap-4">
       {[...Array(3)].map((_, i) => (
         <div key={i} className="h-6 w-20 bg-gray-200 rounded"></div>
@@ -63,8 +67,8 @@ const PageShimmer = () => (
 
 const formatDate = (date: Date) => date.toLocaleDateString("en-CA");
 
-const OrderSection: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+const OrderSection: React.FC<OrderSectionProps> = ({ ordersList }) => {
+  const [orders, setOrders] = useState<Order[]>(ordersList || []);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("All Orders");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -72,43 +76,9 @@ const OrderSection: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<string>("");
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await getAllOrders();
-
-        if (!res.success) {
-          console.error("Failed to fetch orders:", res.message);
-          return;
-        }
-
-        const apiOrders = res.orders;
-
-        if (!Array.isArray(apiOrders)) {
-          console.error("API did not return an array:", apiOrders);
-          return;
-        }
-
-        const formatted: Order[] = apiOrders.map((order: any) => ({
-          ID: order._id,
-          Date: new Date(order.createdAt).toLocaleDateString("en-CA"),
-          Quantity: order.itemsQuantity,
-          Products: order.products
-            .map((p: any) => p.item?.name || "Unknown")
-            .join(", "),
-          Price: `$${Number(order.totalPrice).toFixed(2)}`,
-          Status: order.pickupStatus || "Pending",
-        }));
-
-        setOrders(formatted);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, []);
+    setOrders(ordersList || []);
+    setLoading(false);
+  }, [ordersList]);
 
   const handleDelete = async (orderId: string) => {
     if (!confirm("Are you sure you want to delete this order?")) return;
@@ -130,7 +100,11 @@ const OrderSection: React.FC = () => {
   };
 
   const productOptions = Array.from(
-    new Set(orders.flatMap((order) => order.Products.split(", ")))
+    new Set(
+      orders.flatMap((order) =>
+        order.Products ? order.Products.split(", ") : []
+      )
+    )
   );
 
   let filtered =
@@ -172,17 +146,15 @@ const OrderSection: React.FC = () => {
 
       <div className="flex flex-col md:flex-row md:justify-between gap-3 md:items-center">
         <div className="flex flex-wrap gap-2 items-center">
-          <div className="flex flex-col">
-            <DatePicker
-              selected={selectedDate}
-              onChange={(date: Date | null) => setSelectedDate(date)}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="Date"
-              className="border border-gray-300 text-gray-700 text-medium max-w-[120px] p-2 rounded-md text-sm"
-              maxDate={new Date()}
-              isClearable
-            />
-          </div>
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date: Date | null) => setSelectedDate(date)}
+            dateFormat="yyyy-MM-dd"
+            placeholderText="Date"
+            className="border border-gray-300 text-gray-700 text-medium max-w-[120px] p-2 rounded-md text-sm"
+            maxDate={new Date()}
+            isClearable
+          />
 
           <OrderFilters
             label="By Product"
@@ -226,3 +198,4 @@ const OrderSection: React.FC = () => {
 };
 
 export default OrderSection;
+

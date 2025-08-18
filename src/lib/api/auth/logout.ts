@@ -1,8 +1,7 @@
 "use server";
 import 'server-only'
-import { cookies } from 'next/headers'
+import getAuthHeaders from '@/authHeader';
  
 export async function LogoutAPI() {
-  const cookieStore = await cookies()
-  cookieStore.delete('token')
+   const headers = await getAuthHeaders();
 }

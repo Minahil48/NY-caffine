@@ -37,7 +37,6 @@ const AddCard: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
     }, 1200);
   };
 
-  // 🔹 Skeleton Shimmer
   const ShimmerContent = () => (
     <div className="animate-pulse flex flex-col gap-4">
       <div className="h-6 w-1/3 bg-gray-300 rounded"></div>
@@ -51,7 +50,6 @@ const AddCard: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
   return (
     <div className="fixed inset-0 backdrop-blur-[1px] flex items-center justify-center z-50 px-4">
       <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl relative w-full max-w-md sm:max-w-lg lg:max-w-[480px]">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-2 right-3 text-gray-600 hover:text-black text-2xl"
@@ -59,7 +57,6 @@ const AddCard: React.FC<AddCardProps> = ({ onClose, onAddRow }) => {
           ×
         </button>
 
-        {/* Loading Shimmer */}
         {loading ? (
           <ShimmerContent />
         ) : (

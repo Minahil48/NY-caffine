@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { searchIcon } from "@/assets/common-icons";
 import React from "react";
@@ -8,7 +8,10 @@ interface OrderSearchProps {
   onChange: (value: string) => void;
 }
 
-export const OrderSearch: React.FC<OrderSearchProps> = ({ value, onChange }) => {
+export const OrderSearch: React.FC<OrderSearchProps> = ({
+  value,
+  onChange,
+}) => {
   return (
     <div className="relative py-2 flex items-center justify-center">
       <input

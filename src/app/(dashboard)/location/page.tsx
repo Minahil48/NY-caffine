@@ -1,10 +1,10 @@
 import LocationSection from '@/components/location/LocationSection'
 import React from 'react'
 
-function page() {
+function LocationPage() {
     return (
         <LocationSection />
     )
 }
 
-export default page
+export default LocationPage

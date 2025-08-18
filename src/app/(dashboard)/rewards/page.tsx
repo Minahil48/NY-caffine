@@ -16,7 +16,7 @@ interface Reward {
   image: string;
 }
 
-function Page() {
+function RewardPage() {
   const [showAddCard, setShowAddCard] = useState(false);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,4 +102,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default RewardPage;

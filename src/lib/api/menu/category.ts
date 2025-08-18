@@ -1,65 +1,42 @@
 "use server";
 
 import axiosInstance from "@/axiosInstance";
-import { cookies } from "next/headers";
+import getAuthHeaders from "@/authHeader";
 
 interface CategoryData {
-    id: string;
-    name: string;
+  id?: string;
+  name: string;
 }
-
-export const getAllCategory = async () => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    const res = await axiosInstance.get("/category", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return res.data;
-};
-
-export const addCategory = async (categoryData: CategoryData) => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    const res = await axiosInstance.post(
-        "/category",
-        categoryData,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
-
-    return res.data;
-};
-
-export const deleteCategory= async (CategoryId: string) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const res = await axiosInstance.delete(`/category/${CategoryId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return res.data;
-};
 
 interface UpdateCategoryData {
   id: string;
   name: string;
-  image?: File; // optional image
+  image?: File;
 }
 
+export const getAllCategory = async () => {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.get("/category", { headers });
+  return res.data;
+};
+
+export const addCategory = async (categoryData: CategoryData) => {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.post("/category", categoryData, { headers });
+  return res.data;
+};
+
+export const deleteCategory = async (categoryId: string) => {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.delete(`/category/${categoryId}`, {
+    headers,
+  });
+  return res.data;
+};
+
+// Update a category (with optional image)
 export const updateCategory = async (data: UpdateCategoryData) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const headers = await getAuthHeaders();
 
   try {
     const formData = new FormData();
@@ -68,14 +45,20 @@ export const updateCategory = async (data: UpdateCategoryData) => {
 
     const res = await axiosInstance.put(`/category/${data.id}`, formData, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...headers,
         "Content-Type": "multipart/form-data",
       },
     });
 
     return res.data;
   } catch (err: any) {
-    console.error("Failed to update category:", err.response?.data || err.message);
-    return { success: false, message: err.response?.data?.message || err.message };
+    console.error(
+      "Failed to update category:",
+      err.response?.data || err.message
+    );
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message,
+    };
   }
 };

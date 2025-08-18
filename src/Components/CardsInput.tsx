@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 interface InputFieldProps {
   label: string;
@@ -15,7 +15,7 @@ const CardsInput: React.FC<InputFieldProps> = ({
   required = false,
   value,
   onChange,
-  placeholder = '',
+  placeholder = "",
 }) => {
   return (
     <div className="flex flex-col space-y-1 w-full">

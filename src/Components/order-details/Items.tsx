@@ -1,5 +1,5 @@
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 interface ItemsProps {
   total: string;
@@ -46,7 +46,10 @@ const Items: React.FC<ItemsProps> = ({
           <span className="font-medium">Modifiers:</span>
           <ul className="flex flex-wrap gap-1 text-sm text-gray-500">
             {Modifiers.map((mod, index) => (
-              <li key={index} className="after:content-[','] last:after:content-none">
+              <li
+                key={index}
+                className="after:content-[','] last:after:content-none"
+              >
                 {mod}
               </li>
             ))}

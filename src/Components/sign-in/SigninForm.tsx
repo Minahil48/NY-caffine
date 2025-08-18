@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { CloseEyeIcon, EyeIcon } from "@/assets/common-icons";
-import { useRouter } from 'next/navigation';
-import { loginUser } from '@/lib/api/auth/login';
-import toast from 'react-hot-toast';
-import Column1 from '../Column1';
-import Button from '../Button';
+import { useRouter } from "next/navigation";
+import { loginUser } from "@/lib/api/auth/login";
+import toast from "react-hot-toast";
+import Column1 from "../Column1";
+import Button from "../Button";
 
 function SigninForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const isValid = email.trim() !== '' && password.trim() !== '';
+  const isValid = email.trim() !== "" && password.trim() !== "";
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +60,10 @@ function SigninForm() {
             onSubmit={handleSignIn}
           >
             <div>
-              <label htmlFor="email" className="block mb-4 text-md text-gray-900">
+              <label
+                htmlFor="email"
+                className="block mb-4 text-md text-gray-900"
+              >
                 Branch Email
               </label>
               <input
@@ -75,7 +78,10 @@ function SigninForm() {
             </div>
 
             <div className="relative">
-              <label htmlFor="password" className="block mb-4 text-md text-gray-900">
+              <label
+                htmlFor="password"
+                className="block mb-4 text-md text-gray-900"
+              >
                 Password
               </label>
               <input
@@ -97,7 +103,10 @@ function SigninForm() {
             </div>
 
             <div className="flex justify-end text-sm mb-12">
-              <a href="/forget-password" className="font-medium text-primary hover:underline">
+              <a
+                href="/forget-password"
+                className="font-medium text-primary hover:underline"
+              >
                 Forgot password?
               </a>
             </div>
@@ -105,8 +114,10 @@ function SigninForm() {
             <div className="flex justify-center w-full">
               <Button
                 type="submit"
-                value={loading ? 'Logging in...' : 'Sign in'}
-                className={`w-full ${!isValid || loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                value={loading ? "Logging in..." : "Sign in"}
+                className={`w-full ${
+                  !isValid || loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               />
             </div>
           </form>

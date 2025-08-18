@@ -9,7 +9,6 @@ import DynamicTable from "../order/Table";
 import AddButton from "../menu/AddButton";
 import { getAllItem, deleteItem, updateItem } from "@/lib/api/menu/item";
 
-
 const TableShimmer = () => (
   <div className="w-full border border-gray-200 rounded-lg overflow-hidden animate-pulse">
     <div className="grid grid-cols-3 gap-2 bg-gray-100 p-3">
@@ -81,7 +80,6 @@ const MenuSection: React.FC = () => {
     }
   };
 
-
   const handleEdit = async (updatedRow: Record<string, any>) => {
     try {
       const payload = {
@@ -95,7 +93,11 @@ const MenuSection: React.FC = () => {
       setMenuItems((prev) =>
         prev.map((item) =>
           item._id === updatedRow.ID
-            ? { ...item, name: updatedRow.Name, isActive: updatedRow.Status === "Active" }
+            ? {
+                ...item,
+                name: updatedRow.Name,
+                isActive: updatedRow.Status === "Active",
+              }
             : item
         )
       );
@@ -116,10 +118,14 @@ const MenuSection: React.FC = () => {
     { icon: edit, action: "edit" },
   ];
 
-  const nameOptions = [...new Set(menuItems.map((i) => i.name).filter(Boolean))];
+  const nameOptions = [
+    ...new Set(menuItems.map((i) => i.name).filter(Boolean)),
+  ];
 
   const filteredItems = menuItems
-    .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .filter((item) => !selectedName || item.name === selectedName)
     .filter(
       (item) =>
